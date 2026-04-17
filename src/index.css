@@ -1,0 +1,164 @@
+@import "tailwindcss";
+
+/* =========================
+   🌅 LEVAMEN THEME TOKENS
+   ========================= */
+:root {
+  /* Sunset */
+  --color-sunset-1: #FF7A18;
+  --color-sunset-2: #FFB347;
+  --color-sunset-3: #FF5E62;
+
+  /* Ocean */
+  --color-ocean-1: #0F172A;
+  --color-ocean-2: #1E3A8A;
+  --color-ocean-3: #3B82F6;
+
+  /* Neutrals */
+  --color-bg: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-border: #E2E8F0;
+  --color-text: #0F172A;
+  --color-text-muted: #64748B;
+
+  /* Signature Gradient */
+  --gradient-primary: linear-gradient(
+    135deg,
+    var(--color-sunset-1),
+    var(--color-sunset-2),
+    var(--color-ocean-3)
+  );
+}
+
+/* =========================
+   🌍 BASE STYLES
+   ========================= */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: Inter, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+}
+
+/* =========================
+   ✨ REUSABLE UTILITIES
+   ========================= */
+
+/* Gradient text */
+.gradient-text {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Gradient background */
+.gradient-bg {
+  background: var(--gradient-primary);
+}
+
+/* Glass card */
+.glass {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border);
+}
+
+/* Soft shadow */
+.soft-shadow {
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+/* Glow (blue) */
+.glow-blue {
+  box-shadow: 0 0 40px rgba(59, 130, 246, 0.25);
+}
+
+/* Glow (sunset) */
+.glow-sunset {
+  box-shadow: 0 0 40px rgba(255, 122, 24, 0.25);
+}
+
+/* =========================
+   🔘 BUTTON SYSTEM
+   ========================= */
+
+/* Primary CTA */
+.btn-primary {
+  background: var(--gradient-primary);
+  color: white;
+  padding: 0.6rem 1.4rem;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  transition: all 0.25s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* Secondary button */
+.btn-secondary {
+  background: white;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 0.6rem 1.4rem;
+  border-radius: 0.75rem;
+  transition: all 0.25s ease;
+}
+
+.btn-secondary:hover {
+  background: #f1f5f9;
+}
+
+/* =========================
+   📦 CARD STYLES
+   ========================= */
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+/* Premium glass card (use for demos) */
+.card-glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border);
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+}
+
+/* =========================
+   🧱 SECTION HELPERS
+   ========================= */
+
+.section {
+  padding: 5rem 1.5rem;
+}
+
+.container-custom {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+::selection {
+  background: rgba(255, 179, 71, 0.35);
+  color: var(--color-text);
+}
