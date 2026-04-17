@@ -1,4 +1,5 @@
 import Hero from "../components/sections/Hero";
+import PricingPreview from "../components/pricing/PricingPreview";
 
 export default function Home() {
   return (
@@ -13,6 +14,8 @@ export default function Home() {
         secondaryCtaText="Get in Touch"
         secondaryCtaTo="/contact"
       />
+
+      <PricingPreview />
     </>
   );
 }

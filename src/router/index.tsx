@@ -27,6 +27,9 @@ import LawFirmDemo from "../pages/demo-pages/LawFirmDemo";
 import ConstructionDemo from "../pages/demo-pages/ConstructionDemo";
 import MovingCompanyDemo from "../pages/demo-pages/MovingCompanyDemo";
 import HomeRemodelingDemo from "../pages/demo-pages/HomeRemodelingDemo";
+import Pricing from "../pages/Pricing";
+import Success from "../pages/Success";
+import Failure from "../pages/Failure";
 
 export const router = createBrowserRouter([
   {
@@ -55,7 +58,10 @@ export const router = createBrowserRouter([
       { path: "/demos/construction", element: <ConstructionDemo /> },
       { path: "/demos/moving-company", element: <MovingCompanyDemo /> },
       { path: "/demos/home-remodeling", element: <HomeRemodelingDemo /> },
+      { path: "/pricing", element: <Pricing /> },
       { path: "/reviews", element: <Reviews /> },
+      { path: "/success", element: <Success /> },
+      { path: "/failure", element: <Failure /> },
       { path: "/admin", element: <Admin /> },
       { path: "*", element: <NotFound /> },
     ],
