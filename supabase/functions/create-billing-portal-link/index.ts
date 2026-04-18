@@ -1,57 +1,36 @@
-import Stripe from "https://esm.sh/stripe@18.4.0?target=denonext";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createSupabaseAdminClient, HttpError, requireAuthorizedAdmin } from "../_shared/admin.ts";
+import { jsonResponse } from "../_shared/http.ts";
+import { createStripeClient } from "../_shared/stripe.ts";
 
-const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY") || "";
-const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
-const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
-const supabaseServiceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+// Keep the return destination configurable across sandbox and production.
 const billingPortalReturnUrl =
   Deno.env.get("BILLING_PORTAL_RETURN_URL") || "https://levamentech.com/success";
 
-const stripe = new Stripe(stripeSecretKey, {
-  appInfo: {
-    name: "Levamen Tech Billing Portal",
-    version: "1.0.0",
-  },
-});
+const stripe = createStripeClient("Levamen Tech Billing Portal");
 
 Deno.serve(async (req) => {
   try {
     if (req.method === "OPTIONS") {
-      return response({ ok: true });
+      return jsonResponse({ ok: true });
     }
 
     if (req.method !== "POST") {
-      return response({ error: "Method not allowed" }, 405);
+      return jsonResponse({ error: "Method not allowed." }, 405);
     }
 
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return response({ error: "Missing Authorization header" }, 401);
-    }
+    await requireAuthorizedAdmin(req.headers.get("Authorization"));
 
-    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
-      global: {
-        headers: { Authorization: authHeader },
-      },
-    });
+    const payload = await req.json();
+    const clientId =
+      payload && typeof payload === "object" && typeof payload.clientId === "string"
+        ? payload.clientId
+        : "";
 
-    const {
-      data: { user },
-      error: userError,
-    } = await userClient.auth.getUser();
-
-    if (userError || !user) {
-      return response({ error: "Unauthorized" }, 401);
-    }
-
-    const { clientId } = await req.json();
     if (!clientId) {
-      return response({ error: "Missing clientId" }, 400);
+      return jsonResponse({ error: "Missing clientId." }, 400);
     }
 
-    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey);
-
+    const supabaseAdmin = createSupabaseAdminClient();
     const { data: client, error } = await supabaseAdmin
       .from("client_accounts")
       .select("*")
@@ -59,11 +38,14 @@ Deno.serve(async (req) => {
       .single();
 
     if (error || !client) {
-      return response({ error: "Client not found" }, 404);
+      return jsonResponse({ error: "Client not found." }, 404);
     }
 
     if (!client.stripe_customer_id) {
-      return response({ error: "Client does not have a Stripe customer id yet" }, 400);
+      return jsonResponse(
+        { error: "Client does not have a Stripe customer id yet." },
+        400
+      );
     }
 
     const session = await stripe.billingPortal.sessions.create({
@@ -78,24 +60,16 @@ Deno.serve(async (req) => {
       })
       .eq("id", client.id);
 
-    return response({
+    return jsonResponse({
       ok: true,
       url: session.url,
     });
   } catch (error) {
+    if (error instanceof HttpError) {
+      return jsonResponse({ error: error.message }, error.status);
+    }
+
     const message = error instanceof Error ? error.message : "Unknown error";
-    return response({ error: message }, 500);
+    return jsonResponse({ error: message }, 500);
   }
 });
-
-function response(body: Record<string, unknown>, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-    },
-  });
-}

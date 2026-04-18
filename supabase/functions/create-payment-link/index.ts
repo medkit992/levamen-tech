@@ -1,73 +1,44 @@
-// supabase/functions/create-payment-link/index.ts
+import { createSupabaseAdminClient, HttpError, requireAuthorizedAdmin } from "../_shared/admin.ts";
+import { isEmailDeliveryConfigured, sendEmail } from "../_shared/email.ts";
+import { escapeHtml, jsonResponse } from "../_shared/http.ts";
+import {
+  buildCheckoutLineItems,
+  createStripeClient,
+  ensureCustomerForInquiry,
+  formatCurrency,
+} from "../_shared/stripe.ts";
 
-import Stripe from "https://esm.sh/stripe@18.4.0?target=denonext";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const stripe = createStripeClient("Levamen Tech Admin");
 
-const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY") || "";
-const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
-const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
-const supabaseServiceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
-
-const stripe = new Stripe(stripeSecretKey, {
-  appInfo: {
-    name: "Levamen Tech Admin",
-    version: "1.0.0",
-  },
-});
+const successUrl =
+  Deno.env.get("STRIPE_SUCCESS_URL") ||
+  "https://levamentech.com/success?session_id={CHECKOUT_SESSION_ID}";
+const cancelUrl =
+  Deno.env.get("STRIPE_CANCEL_URL") || "https://levamentech.com/failure";
 
 Deno.serve(async (req) => {
   try {
     if (req.method === "OPTIONS") {
-      return new Response("ok", {
-        headers: corsHeaders,
-      });
+      return jsonResponse({ ok: true });
     }
 
     if (req.method !== "POST") {
       return jsonResponse({ error: "Method not allowed." }, 405);
     }
 
-    if (!stripeSecretKey) {
-      return jsonResponse({ error: "Missing STRIPE_SECRET_KEY." }, 500);
-    }
+    await requireAuthorizedAdmin(req.headers.get("Authorization"));
 
-    if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceRoleKey) {
-      return jsonResponse(
-        { error: "Missing default Supabase environment variables." },
-        500
-      );
-    }
-
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return jsonResponse({ error: "Missing Authorization header." }, 401);
-    }
-
-    const { inquiryId } = await req.json();
+    const payload = await req.json();
+    const inquiryId =
+      payload && typeof payload === "object" && typeof payload.inquiryId === "string"
+        ? payload.inquiryId
+        : "";
 
     if (!inquiryId) {
       return jsonResponse({ error: "Missing inquiryId." }, 400);
     }
 
-    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey);
-
-    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
-      global: {
-        headers: {
-          Authorization: authHeader,
-        },
-      },
-    });
-
-    const {
-      data: { user },
-      error: authError,
-    } = await userClient.auth.getUser();
-
-    if (authError || !user) {
-      return jsonResponse({ error: "Unauthorized." }, 401);
-    }
-
+    const supabaseAdmin = createSupabaseAdminClient();
     const { data: inquiry, error: inquiryError } = await supabaseAdmin
       .from("pricing_inquiries")
       .select("*")
@@ -78,95 +49,94 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: "Inquiry not found." }, 404);
     }
 
-    const setupTotal =
-      Number(inquiry.plan_setup_price || 0) +
-      Number(inquiry.addon_one_time_total || 0) +
-      Number(inquiry.domain_one_time_fee || 0);
+    const existingSessionId =
+      typeof inquiry.stripe_checkout_session_id === "string"
+        ? inquiry.stripe_checkout_session_id
+        : "";
 
-    const monthlyTotal =
-      Number(inquiry.plan_monthly_price || 0) +
-      Number(inquiry.addon_monthly_total || 0) +
-      Number(inquiry.domain_privacy_monthly_fee || 0);
+    if (existingSessionId) {
+      try {
+        const existingSession = await stripe.checkout.sessions.retrieve(
+          existingSessionId
+        );
 
-    if (setupTotal <= 0 && monthlyTotal <= 0) {
-      return jsonResponse(
-        { error: "Inquiry does not contain any billable amount." },
-        400
-      );
+        if (existingSession.status === "open" && existingSession.url) {
+          const resendResult = await maybeSendPaymentLinkEmail(
+            inquiry,
+            existingSession.url
+          );
+          const existingCustomerId =
+            typeof existingSession.customer === "string"
+              ? existingSession.customer
+              : existingSession.customer?.id || null;
+
+          return jsonResponse({
+            ok: true,
+            reused: true,
+            url: existingSession.url,
+            sessionId: existingSession.id,
+            customerId: existingCustomerId,
+            customerEmail: inquiry.email,
+            emailSubject: buildPaymentEmailSubject(inquiry),
+            emailBody: buildPaymentEmailText(inquiry, existingSession.url),
+            emailDeliveryStatus: resendResult.status,
+            emailDeliveryError: resendResult.error,
+            lineItems: [],
+          });
+        }
+      } catch {
+        // Fall through to create a fresh Checkout Session when the saved one
+        // is no longer retrievable.
+      }
     }
 
-    const customer = await stripe.customers.create({
-      email: inquiry.email,
-      name: inquiry.full_name,
-      metadata: {
-        inquiry_id: inquiry.id,
-        business_name: inquiry.business_name ?? "",
-      },
-    });
-
-    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
-
-    if (setupTotal > 0) {
-      lineItems.push({
-        quantity: 1,
-        price_data: {
-          currency: "usd",
-          unit_amount: Math.round(setupTotal * 100),
-          product_data: {
-            name: `${inquiry.plan_name} Setup`,
-            description: `One-time setup for ${inquiry.business_name}`,
-          },
-        },
-      });
-    }
-
-    if (monthlyTotal > 0) {
-      lineItems.push({
-        quantity: 1,
-        price_data: {
-          currency: "usd",
-          unit_amount: Math.round(monthlyTotal * 100),
-          recurring: {
-            interval: "month",
-          },
-          product_data: {
-            name: `${inquiry.plan_name} Monthly Maintenance`,
-            description: `Monthly recurring service for ${inquiry.business_name}`,
-          },
-        },
-      });
-    }
-
-    const successUrl =
-      Deno.env.get("STRIPE_SUCCESS_URL") ||
-      "https://levamentech.com/success?session_id={CHECKOUT_SESSION_ID}";
-
-    const cancelUrl =
-      Deno.env.get("STRIPE_CANCEL_URL") ||
-      "https://levamentech.com/failure";
+    const { lineItems, hasRecurring, itemNames } = await buildCheckoutLineItems(
+      stripe,
+      inquiry
+    );
+    const customerId = await ensureCustomerForInquiry(stripe, inquiry);
 
     const session = await stripe.checkout.sessions.create({
-      mode: monthlyTotal > 0 ? "subscription" : "payment",
-      customer: customer.id,
-      customer_email: inquiry.email,
+      mode: hasRecurring ? "subscription" : "payment",
+      customer: customerId,
       line_items: lineItems,
       success_url: successUrl,
       cancel_url: cancelUrl,
+      billing_address_collection: "auto",
+      phone_number_collection: {
+        enabled: true,
+      },
+      customer_update: {
+        address: "auto",
+        name: "auto",
+      },
       metadata: {
         inquiry_id: inquiry.id,
         business_name: inquiry.business_name ?? "",
         full_name: inquiry.full_name ?? "",
+        email: inquiry.email ?? "",
       },
       client_reference_id: inquiry.id,
-      subscription_data:
-        monthlyTotal > 0
-          ? {
-              metadata: {
-                inquiry_id: inquiry.id,
-                business_name: inquiry.business_name ?? "",
-              },
-            }
-          : undefined,
+      subscription_data: hasRecurring
+        ? {
+            metadata: {
+              inquiry_id: inquiry.id,
+              business_name: inquiry.business_name ?? "",
+              full_name: inquiry.full_name ?? "",
+              email: inquiry.email ?? "",
+            },
+          }
+        : undefined,
+      payment_intent_data: hasRecurring
+        ? undefined
+        : {
+            metadata: {
+              inquiry_id: inquiry.id,
+              business_name: inquiry.business_name ?? "",
+              full_name: inquiry.full_name ?? "",
+              email: inquiry.email ?? "",
+            },
+          },
     });
 
     const sentAt = new Date().toISOString();
@@ -185,38 +155,32 @@ Deno.serve(async (req) => {
     if (updateError) {
       return jsonResponse(
         {
-          error: `Stripe session created, but DB update failed: ${updateError.message}`,
+          error: `Stripe checkout created, but DB update failed: ${updateError.message}`,
         },
         500
       );
     }
 
-    const emailSubject = `Levamen Tech payment link for ${inquiry.business_name}`;
-    const emailBody = [
-      `Hi ${inquiry.full_name},`,
-      ``,
-      `Thanks again for your interest in working with Levamen Tech.`,
-      `Here is your secure payment link to get started:`,
-      `${session.url}`,
-      ``,
-      `Plan: ${inquiry.plan_name}`,
-      `One-time total: $${Number(inquiry.total_setup || 0).toFixed(2)}`,
-      `Monthly total: $${Number(inquiry.total_monthly || 0).toFixed(2)}`,
-      ``,
-      `If you have any questions before paying, just reply to this email.`,
-      ``,
-      `- Levamen Tech`,
-    ].join("\n");
+    const resendResult = await maybeSendPaymentLinkEmail(inquiry, session.url || "");
 
     return jsonResponse({
       ok: true,
+      reused: false,
       url: session.url,
       sessionId: session.id,
+      customerId,
       customerEmail: inquiry.email,
-      emailSubject,
-      emailBody,
+      emailSubject: buildPaymentEmailSubject(inquiry),
+      emailBody: buildPaymentEmailText(inquiry, session.url || ""),
+      emailDeliveryStatus: resendResult.status,
+      emailDeliveryError: resendResult.error,
+      lineItems: itemNames,
     });
   } catch (error) {
+    if (error instanceof HttpError) {
+      return jsonResponse({ error: error.message }, error.status);
+    }
+
     const message =
       error instanceof Error ? error.message : "Unknown server error";
 
@@ -224,17 +188,96 @@ Deno.serve(async (req) => {
   }
 });
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Content-Type": "application/json",
-};
+function buildPaymentEmailSubject(inquiry: Record<string, unknown>) {
+  return `Levamen Tech payment link for ${String(
+    inquiry.business_name || "your project"
+  )}`;
+}
 
-function jsonResponse(body: Record<string, unknown>, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: corsHeaders,
+function buildPaymentEmailText(
+  inquiry: Record<string, unknown>,
+  checkoutUrl: string
+) {
+  return [
+    `Hi ${String(inquiry.full_name || "there")},`,
+    "",
+    "Thanks again for your interest in working with Levamen Tech.",
+    "Here is your secure payment link to get started:",
+    checkoutUrl,
+    "",
+    `Plan: ${String(inquiry.plan_name || "Custom package")}`,
+    `One-time total: ${formatCurrency(Number(inquiry.total_setup || 0))}`,
+    `Monthly total: ${formatCurrency(Number(inquiry.total_monthly || 0))}`,
+    "",
+    "If you have any questions before paying, just reply to this email.",
+    "",
+    "- Levamen Tech",
+  ].join("\n");
+}
+
+function buildPaymentEmailHtml(
+  inquiry: Record<string, unknown>,
+  checkoutUrl: string
+) {
+  const fullName = escapeHtml(String(inquiry.full_name || "there"));
+  const planName = escapeHtml(String(inquiry.plan_name || "Custom package"));
+  const businessName = escapeHtml(String(inquiry.business_name || "your project"));
+  const totalSetup = formatCurrency(Number(inquiry.total_setup || 0));
+  const totalMonthly = formatCurrency(Number(inquiry.total_monthly || 0));
+
+  return `
+    <div style="font-family:Arial,sans-serif;line-height:1.6;color:#0f172a;">
+      <p>Hi ${fullName},</p>
+      <p>Thanks again for your interest in working with <strong>Levamen Tech</strong>.</p>
+      <p>Your reviewed payment link for <strong>${businessName}</strong> is ready:</p>
+      <p>
+        <a href="${checkoutUrl}" style="display:inline-block;padding:12px 18px;background:#0f172a;color:#ffffff;text-decoration:none;border-radius:10px;font-weight:700;">
+          Complete payment
+        </a>
+      </p>
+      <p><strong>Plan:</strong> ${planName}<br />
+      <strong>One-time total:</strong> ${escapeHtml(totalSetup)}<br />
+      <strong>Monthly total:</strong> ${escapeHtml(totalMonthly)}</p>
+      <p>If you have any questions before paying, just reply to this email.</p>
+      <p>- Levamen Tech</p>
+    </div>
+  `;
+}
+
+async function maybeSendPaymentLinkEmail(
+  inquiry: Record<string, unknown>,
+  checkoutUrl: string
+) {
+  if (!checkoutUrl) {
+    return {
+      status: "failed",
+      error: "Stripe checkout URL was not generated.",
+    };
+  }
+
+  if (!isEmailDeliveryConfigured()) {
+    return {
+      status: "skipped",
+      error: "RESEND_API_KEY is not configured.",
+    };
+  }
+
+  const result = await sendEmail({
+    to: [String(inquiry.email || "")],
+    subject: buildPaymentEmailSubject(inquiry),
+    html: buildPaymentEmailHtml(inquiry, checkoutUrl),
+    text: buildPaymentEmailText(inquiry, checkoutUrl),
   });
+
+  if (result.delivered) {
+    return {
+      status: "sent",
+      error: null,
+    };
+  }
+
+  return {
+    status: result.skipped ? "skipped" : "failed",
+    error: result.error,
+  };
 }

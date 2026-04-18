@@ -151,8 +151,8 @@ function StepShell({
   children,
 }: StepShellProps) {
   return (
-    <div className="card-glass soft-shadow rounded-[1.75rem] p-6 md:p-8">
-      <div className="mb-6 flex items-start gap-4">
+    <div className="card-glass soft-shadow rounded-[1.75rem] p-5 sm:p-6 md:p-8">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start">
         <div className="rounded-2xl p-3 gradient-bg text-white">{icon}</div>
         <div>
           <h2 className="text-2xl font-semibold text-[var(--color-text)] md:text-3xl">
@@ -322,7 +322,6 @@ export default function Pricing() {
     });
 
     if (error) {
-      console.error("Supabase insert failed:", error);
       setSubmitError(
         "Something went wrong while sending your request. Please try again."
       );
@@ -335,7 +334,7 @@ export default function Pricing() {
   };
 
   return (
-    <section className="section">
+    <section className="section pt-8 sm:pt-10">
       <div className="container-custom">
         <div className="mb-8 grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
           <div>
@@ -344,18 +343,18 @@ export default function Pricing() {
               Build your website package
             </p>
 
-            <h1 className="text-4xl font-semibold tracking-tight text-[var(--color-text)] md:text-5xl">
+            <h1 className="text-3xl font-semibold tracking-tight text-[var(--color-text)] sm:text-4xl md:text-5xl">
               Choose your <span className="gradient-text">website plan</span>
             </h1>
 
-            <p className="mt-4 max-w-3xl text-lg text-[var(--color-text-muted)]">
+            <p className="mt-4 max-w-3xl text-base leading-8 text-[var(--color-text-muted)] sm:text-lg">
               Pick your plan, customize it with add-ons, choose your domain
               setup, and send over your business details. I’ll review your
               request and reach out before any payment is requested.
             </p>
           </div>
 
-          <aside className="card soft-shadow rounded-[1.75rem] p-6">
+          <aside className="card soft-shadow rounded-[1.75rem] p-5 sm:p-6">
             <div className="mb-4 flex items-center gap-3">
               <ShieldCheck className="text-[var(--color-ocean-3)]" size={20} />
               <h3 className="text-lg font-semibold text-[var(--color-text)]">
@@ -396,7 +395,7 @@ export default function Pricing() {
           </aside>
         </div>
 
-        <div className="mb-8 flex flex-wrap gap-3">
+        <div className="mb-8 flex flex-wrap gap-2 sm:gap-3">
           {[
             { id: 1, label: "Plan" },
             { id: 2, label: "Add-ons" },
@@ -411,7 +410,7 @@ export default function Pricing() {
               <div
                 key={item.id}
                 className={[
-                  "rounded-full border px-4 py-2 text-sm transition",
+                  "rounded-full border px-4 py-2 text-xs transition sm:text-sm",
                   isActive
                     ? "gradient-bg border-transparent text-white"
                     : isComplete
@@ -1026,7 +1025,7 @@ export default function Pricing() {
                       type="button"
                       onClick={handleSubmit}
                       disabled={isSubmitting || submitSuccess}
-                      className="btn-primary flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="btn-primary flex w-full items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
                     >
                       {isSubmitting ? "Submitting..." : submitSuccess ? "Request Sent" : "Submit for Review"}
                       <ArrowRight size={16} />
@@ -1036,7 +1035,7 @@ export default function Pricing() {
                       type="button"
                       onClick={() => setStep(4)}
                       disabled={isSubmitting}
-                      className="btn-secondary disabled:cursor-not-allowed disabled:opacity-60"
+                      className="btn-secondary w-full disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
                     >
                       Edit details
                     </button>
@@ -1050,12 +1049,12 @@ export default function Pricing() {
               </StepShell>
             )}
 
-            <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
               <button
                 type="button"
                 onClick={() => setStep((prev) => Math.max(1, prev - 1))}
                 disabled={step === 1 || isSubmitting}
-                className="btn-secondary flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className="btn-secondary flex w-full items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
               >
                 <ArrowLeft size={16} />
                 Back
@@ -1072,7 +1071,7 @@ export default function Pricing() {
                   (step === 4 && !canContinueStep4) ||
                   step === 5
                 }
-                className="btn-primary flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className="btn-primary flex w-full items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
               >
                 Next
                 <ArrowRight size={16} />

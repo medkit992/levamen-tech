@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local agent / tool metadata
+.agents/
+.claude/
+skills-lock.json
+
+# Supabase local temp output
+supabase/.temp/

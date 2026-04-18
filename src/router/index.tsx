@@ -30,6 +30,8 @@ import HomeRemodelingDemo from "../pages/demo-pages/HomeRemodelingDemo";
 import Pricing from "../pages/Pricing";
 import Success from "../pages/Success";
 import Failure from "../pages/Failure";
+import TermsOfService from "../pages/TermsOfService";
+import PrivacyPolicy from "../pages/PrivacyPolicy";
 
 export const router = createBrowserRouter([
   {
@@ -48,6 +50,7 @@ export const router = createBrowserRouter([
       { path: "/demos/auto-detailing", element: <AutoDetailingDemo /> },
       { path: "/demos/restaurants", element: <RestaurantsDemo /> },
       { path: "/demos/cafe", element: <CafeDemo /> },
+      { path: "/demos/cafes-coffee-shops", element: <CafeDemo /> },
       { path: "/demos/barbershops", element: <BarbershopDemo /> },
       { path: "/demos/salons", element: <SalonDemo /> },
       { path: "/demos/fitness-personal-training", element: <FitnessDemo /> },
@@ -60,10 +63,12 @@ export const router = createBrowserRouter([
       { path: "/demos/home-remodeling", element: <HomeRemodelingDemo /> },
       { path: "/pricing", element: <Pricing /> },
       { path: "/reviews", element: <Reviews /> },
-      { path: "/success", element: <Success /> },
-      { path: "/failure", element: <Failure /> },
-      { path: "/admin", element: <Admin /> },
+      { path: "/terms", element: <TermsOfService /> },
+      { path: "/privacy", element: <PrivacyPolicy /> },
       { path: "*", element: <NotFound /> },
     ],
   },
+  { path: "/success", element: <Success /> },
+  { path: "/failure", element: <Failure /> },
+  { path: "/admin", element: <Admin /> },
 ]);
