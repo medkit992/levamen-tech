@@ -41,18 +41,22 @@ export default function Navbar() {
 
   return (
     <header className="relative sticky top-0 z-50 border-b border-white/50 bg-white/72 shadow-[0_20px_60px_rgba(15,23,42,0.06)] backdrop-blur-2xl">
-      <div className="container-custom">
+      <div className="container-custom px-4 sm:px-6 lg:px-0">
         <nav className="flex min-h-[5rem] items-center justify-between gap-4 py-3">
-          <NavLink to="/" className="group flex items-center gap-3" onClick={handleCloseMenu}>
+          <NavLink
+            to="/"
+            className="group flex min-w-0 items-center gap-3"
+            onClick={handleCloseMenu}
+          >
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,rgba(255,122,24,0.14),rgba(75,140,255,0.16))] text-slate-800 shadow-[0_12px_30px_rgba(15,23,42,0.08)] ring-1 ring-white/70 transition duration-300 group-hover:-translate-y-0.5">
               <Sparkles className="h-4 w-4" strokeWidth={2} />
             </div>
 
-            <div>
-              <div className="text-[0.7rem] font-extrabold uppercase tracking-[0.28em] text-slate-400">
+            <div className="min-w-0">
+              <div className="text-[0.65rem] font-extrabold uppercase tracking-[0.22em] text-slate-400 sm:text-[0.7rem] sm:tracking-[0.28em]">
                 Levamen
               </div>
-              <span className="text-xl font-extrabold tracking-[-0.04em] text-slate-950">
+              <span className="block text-lg font-extrabold tracking-[-0.04em] text-slate-950 sm:text-xl">
                 Levamen Tech
               </span>
             </div>
@@ -120,7 +124,7 @@ export default function Navbar() {
           <div className="absolute inset-x-4 top-[calc(100%+0.8rem)] z-[55] lg:hidden">
             <div
               id="mobile-navigation"
-              className="max-h-[calc(100vh-6.5rem)] overflow-y-auto rounded-[1.9rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.97),rgba(246,249,255,0.95))] p-5 shadow-[0_28px_90px_rgba(15,23,42,0.16)] backdrop-blur-2xl"
+              className="max-h-[calc(100dvh-6.8rem)] overflow-y-auto overscroll-contain rounded-[1.9rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.97),rgba(246,249,255,0.95))] p-5 pb-[calc(1.5rem+env(safe-area-inset-bottom))] shadow-[0_28px_90px_rgba(15,23,42,0.16)] backdrop-blur-2xl"
             >
               <div className="mb-5 flex items-center justify-between gap-4">
                 <div>
@@ -155,7 +159,12 @@ export default function Navbar() {
                     {({ isActive }) => (
                       <div className="flex items-start justify-between gap-4">
                         <div>
-                          <p className="text-base font-extrabold tracking-[-0.02em]">
+                          <p
+                            className={[
+                              "text-base font-extrabold tracking-[-0.02em]",
+                              isActive ? "text-white" : "text-slate-950",
+                            ].join(" ")}
+                          >
                             {item.label}
                           </p>
                           {item.description ? (

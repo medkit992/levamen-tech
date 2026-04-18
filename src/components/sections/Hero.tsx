@@ -46,7 +46,7 @@ export default function Hero({
   }
 
   return (
-    <section className="relative overflow-hidden px-4 pt-6 sm:px-8 sm:pt-10 lg:px-12">
+    <section className="relative px-4 pt-6 sm:px-8 sm:pt-10 lg:px-12">
       <div className="container-custom">
         <div className="section-panel px-5 py-8 sm:px-10 sm:py-10 lg:px-14 lg:py-14">
           <div className="absolute -left-10 top-6 h-36 w-36 rounded-full bg-orange-200/50 blur-3xl sm:-left-16 sm:top-8 sm:h-44 sm:w-44" />
