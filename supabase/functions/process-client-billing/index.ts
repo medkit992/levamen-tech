@@ -7,9 +7,33 @@ import {
 import { sendAdminAlert, sendEmail } from "../_shared/email.ts";
 import { escapeHtml, jsonResponse, safeJson } from "../_shared/http.ts";
 import { createStripeClient } from "../_shared/stripe.ts";
+import * as jose from "jsr:@panva/jose@6";
 
 const billingPortalReturnUrl =
   Deno.env.get("BILLING_PORTAL_RETURN_URL") || "https://levamentech.com/success";
+const githubActionsBillingAudience =
+  Deno.env.get("GITHUB_ACTIONS_BILLING_AUDIENCE") ||
+  "levamen-tech-billing-cron";
+const githubActionsBillingRepository =
+  Deno.env.get("GITHUB_ACTIONS_BILLING_REPOSITORY") ||
+  "medkit992/levamen-tech";
+const githubActionsBillingBranchRef =
+  Deno.env.get("GITHUB_ACTIONS_BILLING_BRANCH_REF") || "refs/heads/main";
+const githubActionsBillingWorkflowRef =
+  Deno.env.get("GITHUB_ACTIONS_BILLING_WORKFLOW_REF") ||
+  `${githubActionsBillingRepository}/.github/workflows/billing-reminders.yml@${githubActionsBillingBranchRef}`;
+const githubActionsBillingSubject = `repo:${githubActionsBillingRepository}:ref:${githubActionsBillingBranchRef}`;
+const githubActionsAllowedEvents = new Set(
+  (Deno.env.get("GITHUB_ACTIONS_BILLING_EVENTS") ||
+    "schedule,workflow_dispatch")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean)
+);
+const githubActionsIssuer = "https://token.actions.githubusercontent.com";
+const githubActionsJwks = jose.createRemoteJWKSet(
+  new URL("https://token.actions.githubusercontent.com/.well-known/jwks")
+);
 
 const stripe = createStripeClient("Levamen Tech Billing Processor");
 
@@ -32,10 +56,10 @@ Deno.serve(async (req) => {
     if (mode === "single") {
       await requireAuthorizedAdmin(authHeader);
     } else {
-      await requireAuthorizedAdminOrCronSecret({
+      await requireDailyBillingInvoker({
         authHeader,
         cronSecretHeader: req.headers.get("x-billing-cron-secret"),
-        secretEnvName: "BILLING_CRON_SECRET",
+        githubOidcToken: req.headers.get("x-github-oidc-token"),
       });
     }
 
@@ -93,6 +117,61 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: message }, 500);
   }
 });
+
+async function requireDailyBillingInvoker({
+  authHeader,
+  cronSecretHeader,
+  githubOidcToken,
+}: {
+  authHeader: string | null;
+  cronSecretHeader: string | null;
+  githubOidcToken: string | null;
+}) {
+  if (githubOidcToken) {
+    await verifyGithubActionsOidcToken(githubOidcToken);
+    return;
+  }
+
+  await requireAuthorizedAdminOrCronSecret({
+    authHeader,
+    cronSecretHeader,
+    secretEnvName: "BILLING_CRON_SECRET",
+  });
+}
+
+async function verifyGithubActionsOidcToken(token: string) {
+  try {
+    const { payload } = await jose.jwtVerify(token, githubActionsJwks, {
+      issuer: githubActionsIssuer,
+      audience: githubActionsBillingAudience,
+    });
+
+    const repository =
+      typeof payload.repository === "string" ? payload.repository : "";
+    const workflowRef =
+      typeof payload.workflow_ref === "string" ? payload.workflow_ref : "";
+    const eventName =
+      typeof payload.event_name === "string" ? payload.event_name : "";
+    const ref = typeof payload.ref === "string" ? payload.ref : "";
+    const sub = typeof payload.sub === "string" ? payload.sub : "";
+
+    if (
+      repository !== githubActionsBillingRepository ||
+      workflowRef !== githubActionsBillingWorkflowRef ||
+      ref !== githubActionsBillingBranchRef ||
+      sub !== githubActionsBillingSubject ||
+      !githubActionsAllowedEvents.has(eventName)
+    ) {
+      throw new HttpError(403, "Untrusted GitHub Actions token.");
+    }
+  } catch (error) {
+    if (error instanceof HttpError) {
+      throw error;
+    }
+
+    throw new HttpError(403, "Invalid GitHub Actions token.");
+  }
+}
 
 async function processOneClient(
   supabaseAdmin: ReturnType<typeof createSupabaseAdminClient>,
