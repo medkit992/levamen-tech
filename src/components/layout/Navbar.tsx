@@ -235,14 +235,18 @@ export default function Navbar() {
                           onClick={handleCloseMenu}
                           className="block rounded-[1rem] border border-slate-200/80 bg-white/90 px-4 py-3 font-semibold transition hover:border-slate-300 hover:bg-white hover:text-slate-950"
                         >
-                          {item.value}
+                          <span className="block break-words [overflow-wrap:anywhere]">
+                            {item.value}
+                          </span>
                         </a>
                       ) : (
                         <div
                           key={item.label}
                           className="rounded-[1rem] border border-slate-200/80 bg-white/90 px-4 py-3 font-semibold"
                         >
-                          {item.value}
+                          <span className="block break-words [overflow-wrap:anywhere]">
+                            {item.value}
+                          </span>
                         </div>
                       )
                     )}

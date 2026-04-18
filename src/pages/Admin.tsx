@@ -9,9 +9,12 @@ import {
   LogOut,
   Mail,
   MessageSquareQuote,
+  Pencil,
   RefreshCw,
   ShieldAlert,
+  Trash2,
   Users,
+  X,
 } from "lucide-react"
 import { supabase } from "../lib/supabase"
 
@@ -66,6 +69,20 @@ type InquiryRow = {
   last_contacted_at: string | null
 }
 
+type InquiryEditForm = {
+  fullName: string
+  email: string
+  businessName: string
+  phone: string
+  businessType: string
+  timeline: string
+  pagesNeeded: string
+  domainName: string
+  inspiration: string
+  goals: string
+  notes: string
+}
+
 type ClientRow = {
   id: string
   pricing_inquiry_id: string | null
@@ -103,6 +120,23 @@ type AdminAction =
   | { action: "review"; operation: "approve" | "delete"; reviewId: string }
   | { action: "inquiry"; inquiryId: string; status: string }
   | {
+      action: "inquiry"
+      operation: "update"
+      inquiryId: string
+      fullName: string
+      email: string
+      businessName: string
+      phone: string
+      businessType: string
+      timeline: string
+      pagesNeeded: string
+      domainName: string
+      inspiration: string
+      goals: string
+      notes: string
+    }
+  | { action: "inquiry"; operation: "delete"; inquiryId: string }
+  | {
       action: "client"
       operation: "updateWebsiteInfo"
       clientId: string
@@ -138,6 +172,28 @@ const buttonClass: Record<ButtonTone, string> = {
     "inline-flex items-center justify-center gap-2 rounded-full border border-red-400/20 bg-red-500/16 px-4 py-2.5 text-sm font-bold text-red-100 transition hover:-translate-y-0.5 hover:bg-red-500/24 disabled:cursor-not-allowed disabled:opacity-50",
 }
 
+const surfaceButtonClass =
+  "inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-slate-100 px-4 py-2.5 text-sm font-bold text-slate-950 transition hover:-translate-y-0.5 hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
+
+const adminFieldClass =
+  "w-full rounded-[1.1rem] border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-slate-300 focus:ring-4 focus:ring-slate-100"
+
+function createInquiryEditForm(inquiry: InquiryRow): InquiryEditForm {
+  return {
+    fullName: inquiry.full_name,
+    email: inquiry.email,
+    businessName: inquiry.business_name,
+    phone: inquiry.phone || "",
+    businessType: inquiry.business_type || "",
+    timeline: inquiry.timeline || "",
+    pagesNeeded: inquiry.pages_needed || "",
+    domainName: inquiry.domain_name || "",
+    inspiration: inquiry.inspiration || "",
+    goals: inquiry.goals || "",
+    notes: inquiry.notes || "",
+  }
+}
+
 function formatDate(value: string | null | undefined, fallback = "—") {
   return value ? new Date(value).toLocaleString() : fallback
 }
@@ -169,9 +225,9 @@ function MetricCard({
   icon: ReactNode
 }) {
   return (
-    <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.07] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.18)] backdrop-blur-xl">
+    <div className="min-w-0 rounded-[1.5rem] border border-white/10 bg-white/[0.07] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.18)] backdrop-blur-xl">
       <div className="flex items-start justify-between gap-4">
-        <div>
+        <div className="min-w-0">
           <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-slate-400">
             {label}
           </p>
@@ -205,11 +261,13 @@ function DetailItem({
   value: React.ReactNode
 }) {
   return (
-    <div className="rounded-[1.2rem] border border-slate-200/80 bg-slate-50/90 p-4">
+    <div className="min-w-0 rounded-[1.2rem] border border-slate-200/80 bg-slate-50/90 p-4">
       <div className="text-[0.72rem] font-extrabold uppercase tracking-[0.18em] text-slate-400">
         {label}
       </div>
-      <div className="mt-2 text-sm font-semibold leading-6 text-slate-700">{value}</div>
+      <div className="mt-2 min-w-0 break-words text-sm font-semibold leading-6 text-slate-700 [overflow-wrap:anywhere]">
+        {value}
+      </div>
     </div>
   )
 }
@@ -253,6 +311,9 @@ export default function Admin() {
   const [dataLoading, setDataLoading] = useState(false)
   const [actionMessage, setActionMessage] = useState("")
   const [busyId, setBusyId] = useState<string | null>(null)
+  const [editingInquiry, setEditingInquiry] = useState<InquiryRow | null>(null)
+  const [inquiryForm, setInquiryForm] = useState<InquiryEditForm | null>(null)
+  const [inquiryFormError, setInquiryFormError] = useState("")
 
   useEffect(() => {
     let mounted = true
@@ -285,6 +346,19 @@ export default function Admin() {
     // loadAdminData is intentionally invoked from session changes only.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session])
+
+  useEffect(() => {
+    if (!editingInquiry) {
+      return
+    }
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
+  }, [editingInquiry])
 
   const pendingReviews = useMemo(
     () => reviews.filter((review) => !review.approved),
@@ -326,6 +400,14 @@ export default function Admin() {
     () => inquiries.filter((inquiry) => inquiry.status !== "approved"),
     [inquiries]
   )
+
+  const inquiryIdsWithLinkedClients = useMemo(() => {
+    return new Set(
+      clients
+        .map((client) => client.pricing_inquiry_id)
+        .filter((value): value is string => Boolean(value))
+    )
+  }, [clients])
 
   async function callAdminAction(action: AdminAction) {
     const { data, error } = await supabase.functions.invoke("admin-dashboard", {
@@ -455,6 +537,101 @@ export default function Admin() {
       const message =
         error instanceof Error ? error.message : "Could not update inquiry."
       setActionMessage(`Could not update inquiry: ${message}`)
+    }
+
+    setBusyId(null)
+  }
+
+  function openInquiryEditor(inquiry: InquiryRow) {
+    setEditingInquiry(inquiry)
+    setInquiryForm(createInquiryEditForm(inquiry))
+    setInquiryFormError("")
+  }
+
+  function closeInquiryEditor() {
+    setEditingInquiry(null)
+    setInquiryForm(null)
+    setInquiryFormError("")
+  }
+
+  function updateInquiryForm<K extends keyof InquiryEditForm>(
+    key: K,
+    value: InquiryEditForm[K]
+  ) {
+    setInquiryForm((current) =>
+      current
+        ? {
+            ...current,
+            [key]: value,
+          }
+        : current
+    )
+    setInquiryFormError("")
+  }
+
+  async function saveInquiryEdits() {
+    if (!editingInquiry || !inquiryForm) return
+
+    const saveBusyId = `inquiry-save:${editingInquiry.id}`
+    setBusyId(saveBusyId)
+    setInquiryFormError("")
+
+    try {
+      const payload = await callAdminAction({
+        action: "inquiry",
+        operation: "update",
+        inquiryId: editingInquiry.id,
+        fullName: inquiryForm.fullName,
+        email: inquiryForm.email,
+        businessName: inquiryForm.businessName,
+        phone: inquiryForm.phone,
+        businessType: inquiryForm.businessType,
+        timeline: inquiryForm.timeline,
+        pagesNeeded: inquiryForm.pagesNeeded,
+        domainName: inquiryForm.domainName,
+        inspiration: inquiryForm.inspiration,
+        goals: inquiryForm.goals,
+        notes: inquiryForm.notes,
+      })
+
+      await loadAdminData({ preserveMessage: true })
+      closeInquiryEditor()
+      setActionMessage(payload.message || "Request details updated.")
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Could not update request."
+      setInquiryFormError(message)
+    }
+
+    setBusyId(null)
+  }
+
+  async function deleteInquiry(inquiry: InquiryRow) {
+    const confirmed = window.confirm(
+      `Delete the request from ${inquiry.business_name}? This cannot be undone.`
+    )
+    if (!confirmed) return
+
+    const deleteBusyId = `inquiry-delete:${inquiry.id}`
+    setBusyId(deleteBusyId)
+    setActionMessage("")
+
+    try {
+      const payload = await callAdminAction({
+        action: "inquiry",
+        operation: "delete",
+        inquiryId: inquiry.id,
+      })
+
+      await loadAdminData({ preserveMessage: true })
+      if (editingInquiry?.id === inquiry.id) {
+        closeInquiryEditor()
+      }
+      setActionMessage(payload.message || "Request deleted.")
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Could not delete request."
+      setActionMessage(`Could not delete request: ${message}`)
     }
 
     setBusyId(null)
@@ -650,9 +827,19 @@ export default function Admin() {
     }
   }
 
+  function canDeleteInquiry(inquiry: InquiryRow) {
+    return !(
+      inquiryIdsWithLinkedClients.has(inquiry.id) ||
+      inquiry.payment_link_url ||
+      inquiry.stripe_checkout_session_id ||
+      inquiry.payment_sent_at ||
+      ["payment_sent", "payment_expired", "paid"].includes(inquiry.status)
+    )
+  }
+
   if (authLoading) {
     return (
-      <main className="min-h-screen bg-[linear-gradient(180deg,#081423_0%,#10213a_100%)] px-6 py-10 text-white sm:px-8">
+      <main className="min-h-screen overflow-x-clip bg-[linear-gradient(180deg,#081423_0%,#10213a_100%)] px-4 py-6 text-white sm:px-6 lg:px-8">
         <div className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-4xl items-center justify-center">
           <div className="rounded-[1.8rem] border border-white/10 bg-white/[0.08] px-8 py-6 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-2xl">
             Loading admin...
@@ -664,10 +851,10 @@ export default function Admin() {
 
   if (!session) {
     return (
-      <main className="min-h-screen bg-[linear-gradient(180deg,#081423_0%,#10213a_100%)] px-6 py-10 text-white sm:px-8">
-        <div className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-5xl items-center gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-          <div className="space-y-6">
-            <div className="rounded-[1.8rem] border border-white/10 bg-white/[0.08] p-8 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-2xl">
+      <main className="min-h-screen overflow-x-clip bg-[linear-gradient(180deg,#081423_0%,#10213a_100%)] px-4 py-6 text-white sm:px-6 lg:px-8">
+        <div className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-5xl items-center gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
+          <div className="min-w-0 space-y-6">
+            <div className="rounded-[1.8rem] border border-white/10 bg-white/[0.08] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-2xl sm:p-8">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/10 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.2em] text-slate-200">
                 <LayoutDashboard className="h-4 w-4" />
                 Levamen Tech admin
@@ -707,7 +894,7 @@ export default function Admin() {
 
           <form
             onSubmit={handleLogin}
-            className="rounded-[1.8rem] border border-white/10 bg-white/[0.08] p-8 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-2xl"
+            className="min-w-0 rounded-[1.8rem] border border-white/10 bg-white/[0.08] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-2xl sm:p-8"
           >
             <div className="mb-6">
               <div className="text-[0.74rem] font-extrabold uppercase tracking-[0.24em] text-slate-300">
@@ -1054,9 +1241,18 @@ export default function Admin() {
 
                     <div className="mt-6 flex flex-wrap gap-3">
                       <button
+                        onClick={() => openInquiryEditor(inquiry)}
+                        disabled={busyId === `inquiry-save:${inquiry.id}`}
+                        className={surfaceButtonClass}
+                      >
+                        <Pencil className="h-4 w-4" />
+                        Edit request
+                      </button>
+
+                      <button
                         onClick={() => void updateInquiryStatus(inquiry.id, "contacted")}
                         disabled={busyId === inquiry.id}
-                        className={buttonClass.secondary.replace("text-white", "text-slate-950").replace("bg-white/8", "bg-slate-100").replace("border-white/14", "border-slate-200")}
+                        className={surfaceButtonClass}
                       >
                         Mark contacted
                       </button>
@@ -1064,7 +1260,7 @@ export default function Admin() {
                       <button
                         onClick={() => void updateInquiryStatus(inquiry.id, "approved")}
                         disabled={busyId === inquiry.id}
-                        className={buttonClass.secondary.replace("text-white", "text-slate-950").replace("bg-white/8", "bg-slate-100").replace("border-white/14", "border-slate-200")}
+                        className={surfaceButtonClass}
                       >
                         Mark approved
                       </button>
@@ -1076,7 +1272,28 @@ export default function Admin() {
                       >
                         {busyId === inquiry.id ? "Creating..." : "Send payment link"}
                       </button>
+
+                      <button
+                        onClick={() => void deleteInquiry(inquiry)}
+                        disabled={
+                          busyId === `inquiry-delete:${inquiry.id}` ||
+                          !canDeleteInquiry(inquiry)
+                        }
+                        className="inline-flex items-center justify-center gap-2 rounded-full border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-bold text-red-700 transition hover:-translate-y-0.5 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        {busyId === `inquiry-delete:${inquiry.id}`
+                          ? "Deleting..."
+                          : "Delete request"}
+                      </button>
                     </div>
+
+                    {!canDeleteInquiry(inquiry) ? (
+                      <p className="mt-3 text-xs font-semibold leading-6 text-slate-500">
+                        Delete is disabled after billing history exists or a client
+                        account is linked to the request.
+                      </p>
+                    ) : null}
                   </article>
                 ))}
               </div>
@@ -1236,7 +1453,232 @@ export default function Admin() {
             </div>
           )}
         </div>
-      </div>
-    </main>
-  )
-}
+        </div>
+
+        {editingInquiry && inquiryForm ? (
+          <div className="fixed inset-0 z-[80] flex items-start justify-center overflow-y-auto bg-slate-950/45 px-4 py-6 sm:px-6">
+            <div className="w-full max-w-4xl rounded-[1.8rem] border border-slate-200 bg-white p-6 text-slate-900 shadow-[0_30px_120px_rgba(15,23,42,0.22)] sm:p-8">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <StatusBadge label={editingInquiry.status} tone="neutral" />
+                    <span className="text-xs font-extrabold uppercase tracking-[0.18em] text-slate-400">
+                      Request editor
+                    </span>
+                  </div>
+
+                  <h2 className="mt-4 text-3xl font-extrabold tracking-[-0.05em] text-slate-950">
+                    Edit {editingInquiry.business_name}
+                  </h2>
+                  <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-500">
+                    Update the request details that guide follow-up and project
+                    scoping. Plan, add-ons, and pricing totals stay as originally
+                    submitted.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={closeInquiryEditor}
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 hover:text-slate-900"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="mt-6 rounded-[1.4rem] border border-slate-200 bg-slate-50/90 px-4 py-4 text-sm leading-7 text-slate-600">
+                <span className="font-extrabold text-slate-900">Package snapshot:</span>{" "}
+                {editingInquiry.plan_name}
+                {editingInquiry.selected_addons?.length
+                  ? ` + ${editingInquiry.selected_addons.join(", ")}`
+                  : ""}
+              </div>
+
+              <form
+                className="mt-6 space-y-6"
+                onSubmit={(event) => {
+                  event.preventDefault()
+                  void saveInquiryEdits()
+                }}
+              >
+                <div className="grid gap-4 md:grid-cols-2">
+                  <label>
+                    <span className="mb-2 block text-sm font-bold text-slate-700">
+                      Full name
+                    </span>
+                    <input
+                      value={inquiryForm.fullName}
+                      onChange={(event) =>
+                        updateInquiryForm("fullName", event.target.value)
+                      }
+                      className={adminFieldClass}
+                    />
+                  </label>
+
+                  <label>
+                    <span className="mb-2 block text-sm font-bold text-slate-700">
+                      Email
+                    </span>
+                    <input
+                      type="email"
+                      value={inquiryForm.email}
+                      onChange={(event) =>
+                        updateInquiryForm("email", event.target.value)
+                      }
+                      className={adminFieldClass}
+                    />
+                  </label>
+
+                  <label>
+                    <span className="mb-2 block text-sm font-bold text-slate-700">
+                      Business name
+                    </span>
+                    <input
+                      value={inquiryForm.businessName}
+                      onChange={(event) =>
+                        updateInquiryForm("businessName", event.target.value)
+                      }
+                      className={adminFieldClass}
+                    />
+                  </label>
+
+                  <label>
+                    <span className="mb-2 block text-sm font-bold text-slate-700">
+                      Phone
+                    </span>
+                    <input
+                      value={inquiryForm.phone}
+                      onChange={(event) =>
+                        updateInquiryForm("phone", event.target.value)
+                      }
+                      className={adminFieldClass}
+                    />
+                  </label>
+
+                  <label>
+                    <span className="mb-2 block text-sm font-bold text-slate-700">
+                      Business type
+                    </span>
+                    <input
+                      value={inquiryForm.businessType}
+                      onChange={(event) =>
+                        updateInquiryForm("businessType", event.target.value)
+                      }
+                      className={adminFieldClass}
+                    />
+                  </label>
+
+                  <label>
+                    <span className="mb-2 block text-sm font-bold text-slate-700">
+                      Timeline
+                    </span>
+                    <input
+                      value={inquiryForm.timeline}
+                      onChange={(event) =>
+                        updateInquiryForm("timeline", event.target.value)
+                      }
+                      className={adminFieldClass}
+                    />
+                  </label>
+
+                  <label>
+                    <span className="mb-2 block text-sm font-bold text-slate-700">
+                      Pages needed
+                    </span>
+                    <input
+                      value={inquiryForm.pagesNeeded}
+                      onChange={(event) =>
+                        updateInquiryForm("pagesNeeded", event.target.value)
+                      }
+                      className={adminFieldClass}
+                    />
+                  </label>
+
+                  <label>
+                    <span className="mb-2 block text-sm font-bold text-slate-700">
+                      Requested domain
+                    </span>
+                    <input
+                      value={inquiryForm.domainName}
+                      onChange={(event) =>
+                        updateInquiryForm("domainName", event.target.value)
+                      }
+                      className={adminFieldClass}
+                    />
+                  </label>
+                </div>
+
+                <div className="grid gap-4">
+                  <label>
+                    <span className="mb-2 block text-sm font-bold text-slate-700">
+                      Inspiration / reference sites
+                    </span>
+                    <textarea
+                      value={inquiryForm.inspiration}
+                      onChange={(event) =>
+                        updateInquiryForm("inspiration", event.target.value)
+                      }
+                      className={`${adminFieldClass} min-h-[8rem] resize-y`}
+                    />
+                  </label>
+
+                  <label>
+                    <span className="mb-2 block text-sm font-bold text-slate-700">
+                      Goals
+                    </span>
+                    <textarea
+                      value={inquiryForm.goals}
+                      onChange={(event) =>
+                        updateInquiryForm("goals", event.target.value)
+                      }
+                      className={`${adminFieldClass} min-h-[8rem] resize-y`}
+                    />
+                  </label>
+
+                  <label>
+                    <span className="mb-2 block text-sm font-bold text-slate-700">
+                      Notes
+                    </span>
+                    <textarea
+                      value={inquiryForm.notes}
+                      onChange={(event) =>
+                        updateInquiryForm("notes", event.target.value)
+                      }
+                      className={`${adminFieldClass} min-h-[8rem] resize-y`}
+                    />
+                  </label>
+                </div>
+
+                {inquiryFormError ? (
+                  <div className="rounded-[1.2rem] border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+                    {inquiryFormError}
+                  </div>
+                ) : null}
+
+                <div className="flex flex-col gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
+                  <button
+                    type="button"
+                    onClick={closeInquiryEditor}
+                    className={surfaceButtonClass}
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={busyId === `inquiry-save:${editingInquiry.id}`}
+                    className="inline-flex items-center justify-center gap-2 rounded-full border border-transparent bg-slate-950 px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <Pencil className="h-4 w-4" />
+                    {busyId === `inquiry-save:${editingInquiry.id}`
+                      ? "Saving..."
+                      : "Save changes"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        ) : null}
+      </main>
+    )
+  }

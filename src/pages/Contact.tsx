@@ -159,15 +159,15 @@ export default function Contact() {
 
                   const content = (
                     <div className="flex items-start gap-4 rounded-[1.4rem] border border-slate-200/80 bg-white/92 p-4 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_30px_rgba(15,23,42,0.08)]">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-100 text-slate-700">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-700">
                         <Icon className="h-5 w-5" />
                       </div>
 
-                      <div>
+                      <div className="min-w-0">
                         <p className="text-sm font-semibold text-slate-500">
                           {method.label}
                         </p>
-                        <p className="mt-1 text-base font-extrabold tracking-[-0.02em] text-slate-900">
+                        <p className="mt-1 break-words text-base font-extrabold tracking-[-0.02em] text-slate-900 [overflow-wrap:anywhere]">
                           {method.value}
                         </p>
                       </div>

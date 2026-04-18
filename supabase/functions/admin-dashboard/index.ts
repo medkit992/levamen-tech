@@ -6,6 +6,7 @@ import {
 import { jsonResponse, safeJson } from "../_shared/http.ts";
 
 const REVIEW_ACTIONS = new Set(["approve", "delete"]);
+const INQUIRY_ACTIONS = new Set(["update", "delete"]);
 const INQUIRY_STATUSES = new Set([
   "new",
   "contacted",
@@ -142,9 +143,23 @@ async function handleInquiryAction(
 ) {
   const inquiryId =
     typeof payload.inquiryId === "string" ? payload.inquiryId : "";
+  const operation =
+    typeof payload.operation === "string" ? payload.operation : "";
   const status = typeof payload.status === "string" ? payload.status : "";
 
-  if (!inquiryId || !INQUIRY_STATUSES.has(status)) {
+  if (!inquiryId) {
+    return jsonResponse({ error: "Missing inquiryId." }, 400);
+  }
+
+  if (INQUIRY_ACTIONS.has(operation)) {
+    if (operation === "update") {
+      return await handleInquiryUpdate(supabaseAdmin, inquiryId, payload);
+    }
+
+    return await handleInquiryDelete(supabaseAdmin, inquiryId);
+  }
+
+  if (!INQUIRY_STATUSES.has(status)) {
     return jsonResponse({ error: "Invalid inquiry action payload." }, 400);
   }
 
@@ -164,6 +179,160 @@ async function handleInquiryAction(
   return jsonResponse({
     ok: true,
     message: "Inquiry updated.",
+  });
+}
+
+async function handleInquiryUpdate(
+  supabaseAdmin: ReturnType<typeof createSupabaseAdminClient>,
+  inquiryId: string,
+  payload: Record<string, unknown>
+) {
+  const { data: existing, error: existingError } = await supabaseAdmin
+    .from("pricing_inquiries")
+    .select("*")
+    .eq("id", inquiryId)
+    .maybeSingle();
+
+  if (existingError) {
+    return jsonResponse({ error: existingError.message }, 500);
+  }
+
+  if (!existing) {
+    return jsonResponse({ error: "Inquiry not found." }, 404);
+  }
+
+  const fullName = normalizeRequiredString(payload.fullName, "Full name");
+  const email = normalizeEmail(payload.email);
+  const businessName = normalizeRequiredString(
+    payload.businessName,
+    "Business name"
+  );
+  const phone = normalizeOptionalString(payload.phone);
+  const businessType = normalizeOptionalString(payload.businessType);
+  const timeline = normalizeOptionalString(payload.timeline);
+  const pagesNeeded = normalizeOptionalString(payload.pagesNeeded);
+  const domainName = normalizeOptionalString(payload.domainName);
+  const inspiration = normalizeOptionalString(payload.inspiration);
+  const goals = normalizeOptionalString(payload.goals);
+  const notes = normalizeOptionalString(payload.notes);
+
+  const updatePayload: Record<string, unknown> = {
+    full_name: fullName,
+    email,
+    business_name: businessName,
+    phone,
+    business_type: businessType,
+    timeline,
+    pages_needed: pagesNeeded,
+    domain_name: domainName,
+    inspiration,
+    goals,
+    notes,
+  };
+
+  const nextSnapshot = patchInquirySnapshot(existing.inquiry_snapshot, {
+    fullName,
+    email,
+    businessName,
+    phone,
+    businessType,
+    timeline,
+    pagesNeeded,
+    domainName,
+    inspiration,
+    goals,
+    notes,
+  });
+
+  if (nextSnapshot) {
+    updatePayload.inquiry_snapshot = nextSnapshot;
+  }
+
+  const { error } = await supabaseAdmin
+    .from("pricing_inquiries")
+    .update(updatePayload)
+    .eq("id", inquiryId);
+
+  if (error) {
+    return jsonResponse({ error: error.message }, 500);
+  }
+
+  return jsonResponse({
+    ok: true,
+    message: "Request details updated.",
+  });
+}
+
+async function handleInquiryDelete(
+  supabaseAdmin: ReturnType<typeof createSupabaseAdminClient>,
+  inquiryId: string
+) {
+  const { data: inquiry, error: inquiryError } = await supabaseAdmin
+    .from("pricing_inquiries")
+    .select(
+      "id, status, payment_link_url, stripe_checkout_session_id, payment_sent_at"
+    )
+    .eq("id", inquiryId)
+    .maybeSingle();
+
+  if (inquiryError) {
+    return jsonResponse({ error: inquiryError.message }, 500);
+  }
+
+  if (!inquiry) {
+    return jsonResponse({ error: "Inquiry not found." }, 404);
+  }
+
+  const { data: linkedClient, error: clientError } = await supabaseAdmin
+    .from("client_accounts")
+    .select("id")
+    .eq("pricing_inquiry_id", inquiryId)
+    .maybeSingle();
+
+  if (clientError) {
+    return jsonResponse({ error: clientError.message }, 500);
+  }
+
+  if (linkedClient) {
+    return jsonResponse(
+      {
+        error:
+          "This request is linked to a client account and cannot be deleted.",
+      },
+      400
+    );
+  }
+
+  const hasBillingHistory =
+    Boolean(inquiry.payment_link_url) ||
+    Boolean(inquiry.stripe_checkout_session_id) ||
+    Boolean(inquiry.payment_sent_at) ||
+    ["payment_sent", "payment_expired", "paid"].includes(
+      String(inquiry.status || "")
+    );
+
+  if (hasBillingHistory) {
+    return jsonResponse(
+      {
+        error:
+          "This request already has Stripe billing history. Keep it for recordkeeping instead of deleting it.",
+      },
+      400
+    );
+  }
+
+  const { error } = await supabaseAdmin
+    .from("pricing_inquiries")
+    .delete()
+    .eq("id", inquiryId);
+
+  if (error) {
+    return jsonResponse({ error: error.message }, 500);
+  }
+
+  return jsonResponse({
+    ok: true,
+    message: "Request deleted.",
   });
 }
 
@@ -247,6 +416,79 @@ function normalizeOptionalString(value: unknown) {
 
   const normalized = value.trim();
   return normalized ? normalized : null;
+}
+
+function normalizeRequiredString(value: unknown, label: string) {
+  if (typeof value !== "string") {
+    throw new HttpError(400, `${label} is required.`);
+  }
+
+  const normalized = value.trim();
+  if (!normalized) {
+    throw new HttpError(400, `${label} is required.`);
+  }
+
+  return normalized;
+}
+
+function normalizeEmail(value: unknown) {
+  const email = normalizeRequiredString(value, "Email").toLowerCase();
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailPattern.test(email)) {
+    throw new HttpError(400, "Email must be valid.");
+  }
+
+  return email;
+}
+
+function asRecord(value: unknown) {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? { ...(value as Record<string, unknown>) }
+    : null;
+}
+
+function patchInquirySnapshot(
+  snapshotValue: unknown,
+  updates: {
+    fullName: string;
+    email: string;
+    businessName: string;
+    phone: string | null;
+    businessType: string | null;
+    timeline: string | null;
+    pagesNeeded: string | null;
+    domainName: string | null;
+    inspiration: string | null;
+    goals: string | null;
+    notes: string | null;
+  }
+) {
+  const snapshot = asRecord(snapshotValue);
+  if (!snapshot) {
+    return null;
+  }
+
+  const customer = asRecord(snapshot.customer) ?? {};
+  customer.fullName = updates.fullName;
+  customer.email = updates.email;
+  customer.businessName = updates.businessName;
+  customer.phone = updates.phone ?? "";
+  customer.businessType = updates.businessType ?? "";
+  customer.timeline = updates.timeline ?? "";
+  customer.pagesNeeded = updates.pagesNeeded ?? "";
+  customer.inspiration = updates.inspiration ?? "";
+  customer.goals = updates.goals ?? "";
+  customer.notes = updates.notes ?? "";
+  snapshot.customer = customer;
+
+  const domain = asRecord(snapshot.domain);
+  if (domain) {
+    domain.domainName = updates.domainName ?? "";
+    snapshot.domain = domain;
+  }
+
+  return snapshot;
 }
 
 function normalizeWebsiteUrl(value: unknown) {

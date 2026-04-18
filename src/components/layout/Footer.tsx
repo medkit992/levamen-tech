@@ -140,7 +140,9 @@ export default function Footer() {
                     const content = (
                       <div className="flex items-center gap-3 rounded-[1.2rem] border border-slate-200/80 bg-white/72 px-4 py-3 text-sm font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-white hover:text-slate-950">
                         {icon}
-                        <span>{item.value}</span>
+                        <span className="min-w-0 break-words [overflow-wrap:anywhere]">
+                          {item.value}
+                        </span>
                       </div>
                     )
 
