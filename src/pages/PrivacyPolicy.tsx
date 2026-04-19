@@ -74,13 +74,13 @@ export default function PrivacyPolicy() {
     <section className="section pt-8 sm:pt-10">
       <div className="container-custom">
         <div className="section-panel px-6 py-8 sm:px-10 lg:px-14 lg:py-12">
-          <div className="max-w-4xl">
+          <div className="min-w-0 max-w-4xl">
             <div className="section-kicker">
               <LockKeyhole className="h-3.5 w-3.5" strokeWidth={2} />
               Privacy Policy
             </div>
 
-            <h1 className="mt-6 text-4xl font-extrabold tracking-[-0.06em] text-slate-950 sm:text-5xl md:text-[3.6rem] md:leading-[1.02]">
+            <h1 className="hero-heading mt-6 text-4xl font-extrabold tracking-[-0.06em] text-slate-950 sm:text-5xl md:text-[3.6rem] md:leading-[1.02]">
               A practical privacy policy for contact forms, reviews, and client work.
             </h1>
 

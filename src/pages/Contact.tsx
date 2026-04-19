@@ -66,13 +66,13 @@ export default function Contact() {
                   />
                 </div>
 
-                <div>
+                <div className="min-w-0">
                   <div className="section-kicker">
                     <Sparkles className="h-3.5 w-3.5" strokeWidth={2} />
                     Get to know the builder
                   </div>
 
-                  <h1 className="mt-6 text-3xl font-extrabold tracking-[-0.06em] text-slate-950 sm:text-5xl md:text-[3.4rem] md:leading-[1.02]">
+                  <h1 className="hero-heading mt-6 text-3xl font-extrabold tracking-[-0.06em] text-slate-950 sm:text-5xl md:text-[3.4rem] md:leading-[1.02]">
                     Let&apos;s build something that actually feels custom.
                   </h1>
 

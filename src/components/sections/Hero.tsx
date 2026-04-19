@@ -64,8 +64,8 @@ export default function Hero({
               transition={{ duration: 0.6 }}
               className={
                 isCentered
-                  ? "mx-auto max-w-3xl text-center"
-                  : "max-w-3xl"
+                  ? "mx-auto min-w-0 max-w-3xl text-center"
+                  : "min-w-0 max-w-3xl"
               }
             >
               <div className="section-kicker">
@@ -73,7 +73,7 @@ export default function Hero({
                 {eyebrow}
               </div>
 
-              <h1 className="mt-6 text-4xl font-extrabold tracking-[-0.06em] text-slate-950 sm:text-5xl md:text-6xl md:leading-[1.02]">
+              <h1 className="hero-heading mt-6 text-4xl font-extrabold tracking-[-0.06em] text-slate-950 sm:text-5xl md:text-6xl md:leading-[1.02]">
                 {renderTitle()}
               </h1>
 
@@ -128,7 +128,7 @@ export default function Hero({
                 initial={{ opacity: 0, x: 28 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.7, delay: 0.1 }}
-                className="relative"
+                className="relative min-w-0"
               >
                 <div className="card-glass relative mx-auto max-w-lg overflow-hidden p-5 sm:p-6">
                   <div className="absolute inset-x-0 top-0 h-1 gradient-bg" />

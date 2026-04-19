@@ -70,10 +70,10 @@ export default function DemoPageTemplate({
           }}
         >
           <div className="grid items-center gap-8 sm:gap-12 lg:grid-cols-[1.02fr_0.98fr]">
-            <div className="max-w-3xl">
+            <div className="min-w-0 max-w-3xl">
               <div className="section-kicker">{heroEyebrow}</div>
 
-              <h1 className="mt-6 text-4xl font-extrabold tracking-[-0.06em] text-slate-950 sm:text-5xl md:text-6xl md:leading-[1.02]">
+              <h1 className="hero-heading mt-6 text-4xl font-extrabold tracking-[-0.06em] text-slate-950 sm:text-5xl md:text-6xl md:leading-[1.02]">
                 {renderHeroTitle()}
               </h1>
 
@@ -112,7 +112,7 @@ export default function DemoPageTemplate({
               </div>
             </div>
 
-            <div className="relative">
+            <div className="relative min-w-0">
               <div
                 className="card-glass relative mx-auto max-w-lg overflow-hidden p-5 sm:p-6"
                 style={{

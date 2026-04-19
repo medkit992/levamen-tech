@@ -109,8 +109,11 @@ p {
 
 .gradient-text {
   background: var(--gradient-primary);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 
 .gradient-bg {
@@ -216,8 +219,9 @@ p {
 .section-kicker {
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
-  width: fit-content;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.55rem;
+  max-width: 100%;
   min-height: 2.25rem;
   padding: 0.45rem 0.95rem;
   border-radius: 999px;
@@ -227,7 +231,20 @@ p {
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.18em;
+  line-height: 1.35;
   text-transform: uppercase;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.section-kicker > svg {
+  flex-shrink: 0;
+}
+
+.hero-heading {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .section-panel {
@@ -339,6 +356,11 @@ p {
 @media (max-width: 768px) {
   .section {
     padding: 4.5rem 1.1rem;
+  }
+
+  .section-kicker {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
   }
 
   .card,

@@ -121,13 +121,13 @@ const Reviews = () => {
 
           <div className="relative overflow-hidden rounded-[2rem] border border-white/70 bg-white/70 px-6 py-8 shadow-[0_30px_100px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:px-10 lg:px-14 lg:py-12">
             <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1.3fr)_360px]">
-              <div className="max-w-3xl">
-                <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-orange-200/70 bg-orange-50/90 px-4 py-2 text-sm font-medium text-orange-700">
+              <div className="min-w-0 max-w-3xl">
+                <div className="mb-5 inline-flex max-w-full flex-wrap items-center gap-2 rounded-full border border-orange-200/70 bg-orange-50/90 px-4 py-2 text-sm font-medium text-orange-700">
                   <Sparkles className="h-4 w-4" strokeWidth={1.8} />
                   Proof that the work feels good after launch too
                 </div>
 
-                <h1 className="max-w-2xl text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
+                <h1 className="hero-heading max-w-2xl text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
                   Client <span className="gradient-text">Reviews</span> that speak
                   for the experience
                 </h1>
