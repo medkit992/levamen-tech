@@ -406,16 +406,16 @@ s3_secret_key = "env(S3_SECRET_KEY)"
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":80,\"commaStyle\":\"trailing\"}"
 
 [functions.create-payment-link]
-verify_jwt = true
+verify_jwt = false
 
 [functions.create-billing-portal-link]
-verify_jwt = true
+verify_jwt = false
 
 [functions.admin-dashboard]
-verify_jwt = true
+verify_jwt = false
 
 [functions.outreach-admin]
-verify_jwt = true
+verify_jwt = false
 
 [functions.outreach-unsubscribe]
 verify_jwt = false

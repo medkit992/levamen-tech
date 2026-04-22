@@ -26,6 +26,7 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: "Method not allowed." }, 405);
     }
 
+    // Protected admin action; access is enforced inside the function.
     await requireAuthorizedAdmin(req.headers.get("Authorization"));
 
     const payload = await req.json();

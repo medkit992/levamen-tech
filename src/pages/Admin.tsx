@@ -17,7 +17,7 @@ import {
   X,
 } from "lucide-react"
 import OutreachPanel from "../components/admin/OutreachPanel"
-import { getFunctionAuthHeaders, supabase } from "../lib/supabase"
+import { invokeProtectedFunction, supabase } from "../lib/supabase"
 
 type ReviewRow = {
   id: string
@@ -210,7 +210,9 @@ function openExternalWindow(url: string) {
 function isAdminAuthError(message: string) {
   return (
     message.includes("Admin access required") ||
-    message.includes("Unauthorized")
+    message.includes("Unauthorized") ||
+    message.includes("sign in again") ||
+    message.includes("session expired")
   )
 }
 
@@ -411,17 +413,10 @@ export default function Admin() {
   }, [clients])
 
   async function callAdminAction(action: AdminAction) {
-    const headers = await getFunctionAuthHeaders()
-    const { data, error } = await supabase.functions.invoke("admin-dashboard", {
-      body: action,
-      headers,
-    })
-
-    if (error) {
-      throw new Error(error.message)
-    }
-
-    const payload = (data ?? {}) as AdminDashboardPayload
+    const payload = (await invokeProtectedFunction<AdminDashboardPayload>(
+      "admin-dashboard",
+      action
+    )) as AdminDashboardPayload
 
     if (payload.error) {
       throw new Error(payload.error)
@@ -644,12 +639,17 @@ export default function Admin() {
     setBusyId(inquiryId)
     setActionMessage("")
 
-    const { data, error } = await supabase.functions.invoke("create-payment-link", {
-      body: { inquiryId },
-    })
+    let data: Record<string, unknown> | null = null
 
-    if (error) {
-      setActionMessage(`Could not create payment link: ${error.message}`)
+    try {
+      data = await invokeProtectedFunction<Record<string, unknown>>(
+        "create-payment-link",
+        { inquiryId }
+      )
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unknown function error."
+      setActionMessage(`Could not create payment link: ${message}`)
       setBusyId(null)
       return
     }
@@ -667,7 +667,7 @@ export default function Admin() {
 
     if (paymentUrl && subject && body && emailDeliveryStatus !== "sent") {
       const mailto = `mailto:${encodeURIComponent(
-        data.customerEmail ?? ""
+        typeof data?.customerEmail === "string" ? data.customerEmail : ""
       )}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
 
       openExternalWindow(mailto)
@@ -696,15 +696,17 @@ export default function Admin() {
     setBusyId(clientId)
     setActionMessage("")
 
-    const { data, error } = await supabase.functions.invoke(
-      "create-billing-portal-link",
-      {
-        body: { clientId },
-      }
-    )
+    let data: Record<string, unknown> | null = null
 
-    if (error) {
-      setActionMessage(`Could not create billing portal link: ${error.message}`)
+    try {
+      data = await invokeProtectedFunction<Record<string, unknown>>(
+        "create-billing-portal-link",
+        { clientId }
+      )
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unknown function error."
+      setActionMessage(`Could not create billing portal link: ${message}`)
       setBusyId(null)
       return
     }
@@ -724,22 +726,29 @@ export default function Admin() {
     setBusyId(clientId)
     setActionMessage("")
 
-    const { data, error } = await supabase.functions.invoke("process-client-billing", {
-      body: {
-        mode: "single",
-        clientId,
-        forceSendReminder: true,
-      },
-    })
+    let data: Record<string, unknown> | null = null
 
-    if (error) {
-      setActionMessage(`Could not send reminder: ${error.message}`)
+    try {
+      data = await invokeProtectedFunction<Record<string, unknown>>(
+        "process-client-billing",
+        {
+          mode: "single",
+          clientId,
+          forceSendReminder: true,
+        }
+      )
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unknown function error."
+      setActionMessage(`Could not send reminder: ${message}`)
       setBusyId(null)
       return
     }
 
     await loadAdminData()
-    setActionMessage(data?.message || "Reminder processed.")
+    setActionMessage(
+      typeof data?.message === "string" ? data.message : "Reminder processed."
+    )
     setBusyId(null)
   }
 
