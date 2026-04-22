@@ -164,20 +164,38 @@ const currency = new Intl.NumberFormat("en-US", {
   currency: "USD",
 })
 
+const adminPageClass =
+  "relative min-h-screen overflow-x-clip bg-[#071321] px-4 py-5 text-white sm:px-6 lg:px-8"
+
+const heroPanelClass =
+  "relative overflow-hidden rounded-[2.25rem] border border-white/12 bg-[linear-gradient(160deg,rgba(15,23,42,0.84),rgba(30,41,59,0.56))] p-6 shadow-[0_30px_110px_rgba(0,0,0,0.3)] backdrop-blur-2xl sm:p-8"
+
+const surfaceCardClass =
+  "rounded-[1.85rem] border border-slate-200/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.985),rgba(247,250,252,0.96))] p-6 text-slate-900 shadow-[0_24px_80px_rgba(15,23,42,0.14)]"
+
+const surfaceMetricClass =
+  "rounded-[1.3rem] border border-slate-200/75 bg-white/80 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]"
+
+const surfaceFooterClass =
+  "mt-6 flex flex-wrap gap-3 rounded-[1.35rem] border border-slate-200/70 bg-slate-50/85 p-3"
+
 const buttonClass: Record<ButtonTone, string> = {
   primary:
-    "inline-flex items-center justify-center gap-2 rounded-full border border-transparent bg-white px-4 py-2.5 text-sm font-bold text-slate-950 transition hover:-translate-y-0.5 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50",
+    "inline-flex items-center justify-center gap-2 rounded-full border border-white/70 bg-white px-4 py-2.5 text-sm font-bold text-slate-950 shadow-[0_16px_40px_rgba(255,255,255,0.14)] transition hover:-translate-y-0.5 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50",
   secondary:
-    "inline-flex items-center justify-center gap-2 rounded-full border border-white/14 bg-white/8 px-4 py-2.5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-white/14 disabled:cursor-not-allowed disabled:opacity-50",
+    "inline-flex items-center justify-center gap-2 rounded-full border border-white/14 bg-white/[0.08] px-4 py-2.5 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition hover:-translate-y-0.5 hover:border-white/24 hover:bg-white/[0.14] disabled:cursor-not-allowed disabled:opacity-50",
   danger:
-    "inline-flex items-center justify-center gap-2 rounded-full border border-red-400/20 bg-red-500/16 px-4 py-2.5 text-sm font-bold text-red-100 transition hover:-translate-y-0.5 hover:bg-red-500/24 disabled:cursor-not-allowed disabled:opacity-50",
+    "inline-flex items-center justify-center gap-2 rounded-full border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-bold text-red-700 shadow-[0_12px_26px_rgba(248,113,113,0.14)] transition hover:-translate-y-0.5 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50",
 }
 
 const surfaceButtonClass =
-  "inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-slate-100 px-4 py-2.5 text-sm font-bold text-slate-950 transition hover:-translate-y-0.5 hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
+  "inline-flex items-center justify-center gap-2 rounded-full border border-slate-200/90 bg-white px-4 py-2.5 text-sm font-bold text-slate-800 shadow-[0_10px_26px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+
+const surfacePrimaryButtonClass =
+  "inline-flex items-center justify-center gap-2 rounded-full border border-slate-950/10 bg-slate-950 px-4 py-2.5 text-sm font-bold text-white shadow-[0_16px_30px_rgba(15,23,42,0.16)] transition hover:-translate-y-0.5 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
 
 const adminFieldClass =
-  "w-full rounded-[1.1rem] border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-slate-300 focus:ring-4 focus:ring-slate-100"
+  "w-full rounded-[1.1rem] border border-slate-200/80 bg-slate-50/80 px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-300 focus:bg-white focus:ring-4 focus:ring-slate-100"
 
 function createInquiryEditForm(inquiry: InquiryRow): InquiryEditForm {
   return {
@@ -195,11 +213,11 @@ function createInquiryEditForm(inquiry: InquiryRow): InquiryEditForm {
   }
 }
 
-function formatDate(value: string | null | undefined, fallback = "—") {
+function formatDate(value: string | null | undefined, fallback = "--") {
   return value ? new Date(value).toLocaleString() : fallback
 }
 
-function formatDateOnly(value: string | null | undefined, fallback = "—") {
+function formatDateOnly(value: string | null | undefined, fallback = "--") {
   return value ? new Date(value).toLocaleDateString() : fallback
 }
 
@@ -216,6 +234,21 @@ function isAdminAuthError(message: string) {
   )
 }
 
+function AdminShell({ children }: { children: ReactNode }) {
+  return (
+    <main className={adminPageClass}>
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute left-[-8rem] top-[-10rem] h-[30rem] w-[30rem] rounded-full bg-cyan-300/12 blur-[150px]" />
+        <div className="absolute right-[-10rem] top-[6rem] h-[28rem] w-[28rem] rounded-full bg-blue-400/10 blur-[150px]" />
+        <div className="absolute bottom-[-8rem] left-[12%] h-[24rem] w-[24rem] rounded-full bg-amber-300/8 blur-[140px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.05),transparent_42%)]" />
+      </div>
+
+      <div className="relative mx-auto max-w-[1400px]">{children}</div>
+    </main>
+  )
+}
+
 function MetricCard({
   label,
   value,
@@ -228,19 +261,23 @@ function MetricCard({
   icon: ReactNode
 }) {
   return (
-    <div className="min-w-0 rounded-[1.5rem] border border-white/10 bg-white/[0.07] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.18)] backdrop-blur-xl">
+    <div className="relative min-w-0 overflow-hidden rounded-[1.65rem] border border-white/12 bg-[linear-gradient(180deg,rgba(255,255,255,0.11),rgba(255,255,255,0.05))] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.22)] backdrop-blur-xl">
+      <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white/35 to-transparent" />
+
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-slate-400">
+          <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-slate-300/80">
             {label}
           </p>
-          <p className="mt-3 text-3xl font-extrabold tracking-[-0.05em] text-white">
+          <p className="mt-3 text-3xl font-extrabold tracking-[-0.06em] text-white">
             {value}
           </p>
-          <p className="mt-2 text-sm leading-7 text-slate-300">{description}</p>
+          <p className="mt-2 max-w-[18rem] text-sm leading-7 text-slate-200/85">
+            {description}
+          </p>
         </div>
 
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-slate-100">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/12 text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
           {icon}
         </div>
       </div>
@@ -250,7 +287,7 @@ function MetricCard({
 
 function EmptyState({ message }: { message: string }) {
   return (
-    <div className="rounded-[1.6rem] border border-white/10 bg-white/[0.06] p-8 text-sm leading-7 text-slate-300 shadow-[0_18px_50px_rgba(0,0,0,0.12)]">
+    <div className="rounded-[1.6rem] border border-white/12 bg-white/[0.08] p-8 text-sm leading-7 text-slate-200/85 shadow-[0_18px_50px_rgba(0,0,0,0.16)] backdrop-blur-xl">
       {message}
     </div>
   )
@@ -264,11 +301,11 @@ function DetailItem({
   value: React.ReactNode
 }) {
   return (
-    <div className="min-w-0 rounded-[1.2rem] border border-slate-200/80 bg-slate-50/90 p-4">
-      <div className="text-[0.72rem] font-extrabold uppercase tracking-[0.18em] text-slate-400">
+    <div className="min-w-0 rounded-[1.2rem] border border-slate-200/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(248,250,252,0.88))] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]">
+      <div className="text-[0.72rem] font-extrabold uppercase tracking-[0.18em] text-slate-400/90">
         {label}
       </div>
-      <div className="mt-2 min-w-0 break-words text-sm font-semibold leading-6 text-slate-700 [overflow-wrap:anywhere]">
+      <div className="mt-2 min-w-0 break-words text-sm font-semibold leading-6 text-slate-800 [overflow-wrap:anywhere]">
         {value}
       </div>
     </div>
@@ -283,10 +320,10 @@ function StatusBadge({
   tone?: "success" | "warning" | "danger" | "neutral"
 }) {
   const classes = {
-    success: "bg-emerald-100 text-emerald-800",
-    warning: "bg-amber-100 text-amber-800",
-    danger: "bg-red-100 text-red-700",
-    neutral: "bg-slate-100 text-slate-700",
+    success: "border border-emerald-200 bg-emerald-50 text-emerald-800",
+    warning: "border border-amber-200 bg-amber-50 text-amber-800",
+    danger: "border border-red-200 bg-red-50 text-red-700",
+    neutral: "border border-slate-200 bg-slate-100 text-slate-700",
   }
 
   return (
@@ -849,39 +886,91 @@ export default function Admin() {
     )
   }
 
+  function renderInquiryStatus(status: string) {
+    const normalized = status.toLowerCase()
+
+    if (normalized === "approved" || normalized === "paid") {
+      return { label: status, tone: "success" as const }
+    }
+
+    if (normalized === "new" || normalized === "pending") {
+      return { label: status, tone: "warning" as const }
+    }
+
+    if (normalized.includes("expired")) {
+      return { label: status, tone: "danger" as const }
+    }
+
+    return { label: status, tone: "neutral" as const }
+  }
+
+  const tabItems = [
+    {
+      key: "reviews" as const,
+      label: `Reviews (${pendingReviews.length} pending)`,
+      summary: `${reviews.length} total testimonials`,
+      description: "Approve new testimonials and remove anything that should not go live.",
+    },
+    {
+      key: "requests" as const,
+      label: `Requests (${inquiries.length})`,
+      summary: `${activeInquiries.length} still active`,
+      description: "Track pricing conversations, edits, and payment links from one queue.",
+    },
+    {
+      key: "clients" as const,
+      label: `Clients (${clients.length})`,
+      summary: `${clientsNeedingShutdown.length} need shutdown review`,
+      description: "Watch billing health, reminders, and website status without losing context.",
+    },
+    {
+      key: "outreach" as const,
+      label: "Outreach",
+      summary: "Automation, drafts, and delivery",
+      description: "Review queue health, settings, and recent delivery activity in one place.",
+    },
+  ]
+
+  const activeTab = tabItems.find((item) => item.key === tab) ?? tabItems[0]
+
   if (authLoading) {
     return (
-      <main className="min-h-screen overflow-x-clip bg-[linear-gradient(180deg,#081423_0%,#10213a_100%)] px-4 py-6 text-white sm:px-6 lg:px-8">
-        <div className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-4xl items-center justify-center">
-          <div className="rounded-[1.8rem] border border-white/10 bg-white/[0.08] px-8 py-6 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-2xl">
+      <AdminShell>
+        <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center">
+          <div className="rounded-[1.8rem] border border-white/12 bg-white/[0.08] px-8 py-6 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-2xl">
             Loading admin...
           </div>
         </div>
-      </main>
+      </AdminShell>
     )
   }
 
   if (!session) {
     return (
-      <main className="min-h-screen overflow-x-clip bg-[linear-gradient(180deg,#081423_0%,#10213a_100%)] px-4 py-6 text-white sm:px-6 lg:px-8">
-        <div className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-5xl items-center gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
+      <AdminShell>
+        <div className="grid min-h-[calc(100vh-4rem)] max-w-5xl items-center gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
           <div className="min-w-0 space-y-6">
-            <div className="rounded-[1.8rem] border border-white/10 bg-white/[0.08] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-2xl sm:p-8">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/10 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.2em] text-slate-200">
+            <div className={heroPanelClass}>
+              <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+                <div className="absolute left-[-4rem] top-[-6rem] h-48 w-48 rounded-full bg-cyan-300/10 blur-3xl" />
+                <div className="absolute bottom-[-5rem] right-[-2rem] h-56 w-56 rounded-full bg-blue-300/8 blur-3xl" />
+              </div>
+
+              <div className="relative inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/10 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.2em] text-slate-200">
                 <LayoutDashboard className="h-4 w-4" />
                 Levamen Tech admin
               </div>
 
-              <h1 className="mt-6 text-4xl font-extrabold tracking-[-0.06em] sm:text-5xl">
+              <h1 className="relative mt-6 max-w-2xl text-4xl font-extrabold tracking-[-0.07em] text-white sm:text-5xl">
                 A cleaner control panel for reviews, requests, and billing clients.
               </h1>
 
-              <p className="mt-5 max-w-xl text-base leading-8 text-slate-200">
+              <p className="relative mt-5 max-w-xl text-base leading-8 text-slate-200">
                 Sign in with your Supabase auth account to manage public reviews,
                 pricing requests, and active client accounts from one place.
               </p>
 
-              <div className="mt-8 grid gap-4 sm:grid-cols-3">
+              <div className="relative mt-8 grid gap-4 sm:grid-cols-3">
                 <MetricCard
                   label="Reviews"
                   value="Moderate"
@@ -906,7 +995,7 @@ export default function Admin() {
 
           <form
             onSubmit={handleLogin}
-            className="min-w-0 rounded-[1.8rem] border border-white/10 bg-white/[0.08] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-2xl sm:p-8"
+            className={`${heroPanelClass} min-w-0`}
           >
             <div className="mb-6">
               <div className="text-[0.74rem] font-extrabold uppercase tracking-[0.24em] text-slate-300">
@@ -928,7 +1017,7 @@ export default function Admin() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="field-input bg-white/92 text-slate-900"
+                className={`${adminFieldClass} bg-white/92`}
               />
             </label>
 
@@ -940,7 +1029,7 @@ export default function Admin() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
                 required
-                className="field-input bg-white/92 text-slate-900"
+                className={`${adminFieldClass} bg-white/92`}
               />
             </label>
 
@@ -955,15 +1044,22 @@ export default function Admin() {
             </button>
           </form>
         </div>
-      </main>
+      </AdminShell>
     )
   }
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#081423_0%,#10213a_100%)] px-4 py-6 text-white sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-[1400px]">
-        <div className="rounded-[2rem] border border-white/10 bg-white/[0.06] p-6 shadow-[0_28px_100px_rgba(0,0,0,0.24)] backdrop-blur-2xl sm:p-8">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+    <AdminShell>
+      <>
+        <div className="space-y-6">
+          <div className={heroPanelClass}>
+          <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="absolute left-[-4rem] top-[-7rem] h-56 w-56 rounded-full bg-cyan-300/10 blur-3xl" />
+            <div className="absolute right-[-6rem] top-[3rem] h-64 w-64 rounded-full bg-blue-400/10 blur-3xl" />
+            <div className="absolute bottom-[-7rem] left-[18%] h-56 w-56 rounded-full bg-amber-300/8 blur-3xl" />
+          </div>
+
+          <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/10 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.2em] text-slate-200">
                 <LayoutDashboard className="h-4 w-4" />
@@ -995,7 +1091,7 @@ export default function Admin() {
             </div>
           </div>
 
-          <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="relative mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <MetricCard
               label="Pending reviews"
               value={pendingReviews.length}
@@ -1022,41 +1118,54 @@ export default function Admin() {
             />
           </div>
 
-          <div className="mt-8 flex flex-wrap gap-3">
-            {[
-              { key: "reviews" as const, label: `Reviews (${pendingReviews.length} pending)` },
-              { key: "requests" as const, label: `Requests (${inquiries.length})` },
-              { key: "clients" as const, label: `Clients (${clients.length})` },
-              { key: "outreach" as const, label: "Outreach" },
-            ].map((item) => (
+          <div className="relative mt-8 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+            <div className="flex flex-wrap gap-3">
+              {tabItems.map((item) => (
               <button
                 key={item.key}
                 onClick={() => setTab(item.key)}
-                className={
-                  tab === item.key
-                    ? buttonClass.primary
-                    : buttonClass.secondary
-                }
+                aria-pressed={tab === item.key}
+                className={tab === item.key ? buttonClass.primary : buttonClass.secondary}
               >
                 {item.label}
               </button>
-            ))}
+              ))}
+            </div>
+
+            <div className="max-w-xl rounded-[1.5rem] border border-white/10 bg-slate-950/25 px-5 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+              <div className="text-[0.72rem] font-extrabold uppercase tracking-[0.2em] text-slate-300/75">
+                Current workspace
+              </div>
+              <div className="mt-2 flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
+                <div>
+                  <div className="text-xl font-extrabold tracking-[-0.04em] text-white">
+                    {activeTab.summary}
+                  </div>
+                  <p className="mt-1 text-sm leading-7 text-slate-300">
+                    {activeTab.description}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         {tab === "clients" && clientsNeedingShutdown.length > 0 ? (
-          <div className="mt-6 rounded-[1.6rem] border border-red-400/18 bg-red-500/12 px-5 py-4 text-sm leading-7 text-red-100 shadow-[0_18px_50px_rgba(0,0,0,0.14)]">
-            <div className="font-extrabold uppercase tracking-[0.18em] text-red-100">
+          <div className="flex items-start gap-3 rounded-[1.6rem] border border-red-400/22 bg-red-500/12 px-5 py-4 text-sm leading-7 text-red-100 shadow-[0_18px_50px_rgba(0,0,0,0.14)] backdrop-blur-xl">
+            <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0" />
+            <div>
+              <div className="font-extrabold uppercase tracking-[0.18em] text-red-100">
               Clients needing shutdown
-            </div>
-            <div className="mt-2">
-              {clientsNeedingShutdown.map((client) => client.business_name).join(", ")}
+              </div>
+              <div className="mt-2">
+                {clientsNeedingShutdown.map((client) => client.business_name).join(", ")}
+              </div>
             </div>
           </div>
         ) : null}
 
         {actionMessage ? (
-          <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-white/[0.08] px-5 py-4 text-sm font-semibold text-slate-100 shadow-[0_18px_50px_rgba(0,0,0,0.12)]">
+          <div className="rounded-[1.5rem] border border-white/12 bg-white/[0.08] px-5 py-4 text-sm font-semibold text-slate-100 shadow-[0_18px_50px_rgba(0,0,0,0.12)] backdrop-blur-xl">
             {actionMessage}
           </div>
         ) : null}
@@ -1074,7 +1183,7 @@ export default function Admin() {
                 {reviews.map((review) => (
                   <article
                     key={review.id}
-                    className="rounded-[1.7rem] border border-white/10 bg-white p-6 text-slate-900 shadow-[0_24px_80px_rgba(0,0,0,0.18)]"
+                    className={surfaceCardClass}
                   >
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                       <div>
@@ -1098,7 +1207,7 @@ export default function Admin() {
                         </p>
                       </div>
 
-                      <div className="rounded-[1.2rem] bg-slate-50 px-4 py-3 text-right">
+                      <div className={`${surfaceMetricClass} text-right`}>
                         <div className="text-[0.72rem] font-extrabold uppercase tracking-[0.18em] text-slate-400">
                           Rating
                         </div>
@@ -1108,10 +1217,12 @@ export default function Admin() {
                       </div>
                     </div>
 
-                    <p className="mt-6 text-sm leading-8 text-slate-700">{review.review_text}</p>
+                    <div className="mt-6 rounded-[1.35rem] border border-slate-200/75 bg-slate-50/75 px-4 py-4 text-sm leading-8 text-slate-700">
+                      {review.review_text}
+                    </div>
 
                     <div className="mt-6 grid gap-4 md:grid-cols-2">
-                      <DetailItem label="Project type" value={review.project_type || "—"} />
+                      <DetailItem label="Project type" value={review.project_type || "--"} />
                       <DetailItem
                         label="Project URL"
                         value={
@@ -1125,24 +1236,22 @@ export default function Admin() {
                               Open URL
                               <ExternalLink className="h-4 w-4" />
                             </a>
-                          ) : (
-                            "—"
-                          )
+                          ) : "--"
                         }
                       />
                       <DetailItem label="Created" value={formatDate(review.created_at)} />
                       <DetailItem
                         label="Client logo URL"
-                        value={review.client_logo_url || "—"}
+                        value={review.client_logo_url || "--"}
                       />
                     </div>
 
-                    <div className="mt-6 flex flex-wrap gap-3">
+                    <div className={surfaceFooterClass}>
                       {!review.approved && (
                         <button
                           onClick={() => void approveReview(review.id)}
                           disabled={busyId === review.id}
-                          className={buttonClass.primary}
+                          className={surfacePrimaryButtonClass}
                         >
                           {busyId === review.id ? "Approving..." : "Approve"}
                         </button>
@@ -1165,14 +1274,20 @@ export default function Admin() {
               <EmptyState message="No pricing inquiries found." />
             ) : (
               <div className="grid gap-6">
-                {sortedInquiries.map((inquiry) => (
-                  <article
+                {sortedInquiries.map((inquiry) => {
+                  const inquiryStatus = renderInquiryStatus(inquiry.status)
+
+                  return (
+                    <article
                     key={inquiry.id}
-                    className="rounded-[1.7rem] border border-white/10 bg-white p-6 text-slate-900 shadow-[0_24px_80px_rgba(0,0,0,0.18)]"
+                    className={surfaceCardClass}
                   >
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                       <div>
-                        <StatusBadge label={inquiry.status} tone="neutral" />
+                        <StatusBadge
+                          label={inquiryStatus.label}
+                          tone={inquiryStatus.tone}
+                        />
                         <h2 className="mt-4 text-2xl font-extrabold tracking-[-0.04em] text-slate-950">
                           {inquiry.business_name}
                         </h2>
@@ -1182,7 +1297,7 @@ export default function Admin() {
                         </p>
                       </div>
 
-                      <div className="rounded-[1.2rem] bg-slate-50 px-4 py-3 text-right">
+                      <div className={`${surfaceMetricClass} text-right`}>
                         <div className="text-[0.72rem] font-extrabold uppercase tracking-[0.18em] text-slate-400">
                           Pricing
                         </div>
@@ -1201,9 +1316,9 @@ export default function Admin() {
                         label="Domain"
                         value={`${inquiry.domain_choice}${inquiry.domain_name ? ` (${inquiry.domain_name})` : ""}`}
                       />
-                      <DetailItem label="Timeline" value={inquiry.timeline || "—"} />
-                      <DetailItem label="Pages needed" value={inquiry.pages_needed || "—"} />
-                      <DetailItem label="Business type" value={inquiry.business_type || "—"} />
+                      <DetailItem label="Timeline" value={inquiry.timeline || "--"} />
+                      <DetailItem label="Pages needed" value={inquiry.pages_needed || "--"} />
+                      <DetailItem label="Business type" value={inquiry.business_type || "--"} />
                       <DetailItem label="Created" value={formatDate(inquiry.created_at)} />
                       <DetailItem
                         label="Payment link"
@@ -1230,7 +1345,7 @@ export default function Admin() {
                     </div>
 
                     {inquiry.selected_addons?.length ? (
-                      <div className="mt-5 rounded-[1.3rem] bg-slate-50/90 p-4 text-sm leading-7 text-slate-600">
+                      <div className="mt-5 rounded-[1.3rem] border border-slate-200/75 bg-slate-50/90 p-4 text-sm leading-7 text-slate-600">
                         <span className="font-extrabold text-slate-900">Add-ons:</span>{" "}
                         {inquiry.selected_addons.join(", ")}
                       </div>
@@ -1254,7 +1369,7 @@ export default function Admin() {
                       </div>
                     ) : null}
 
-                    <div className="mt-6 flex flex-wrap gap-3">
+                    <div className={surfaceFooterClass}>
                       <button
                         onClick={() => openInquiryEditor(inquiry)}
                         disabled={busyId === `inquiry-save:${inquiry.id}`}
@@ -1283,7 +1398,7 @@ export default function Admin() {
                       <button
                         onClick={() => void createAndSendPaymentLink(inquiry.id)}
                         disabled={busyId === inquiry.id}
-                        className={buttonClass.primary}
+                        className={surfacePrimaryButtonClass}
                       >
                         {busyId === inquiry.id ? "Creating..." : "Send payment link"}
                       </button>
@@ -1294,7 +1409,7 @@ export default function Admin() {
                           busyId === `inquiry-delete:${inquiry.id}` ||
                           !canDeleteInquiry(inquiry)
                         }
-                        className="inline-flex items-center justify-center gap-2 rounded-full border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-bold text-red-700 transition hover:-translate-y-0.5 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+                        className={buttonClass.danger}
                       >
                         <Trash2 className="h-4 w-4" />
                         {busyId === `inquiry-delete:${inquiry.id}`
@@ -1310,7 +1425,8 @@ export default function Admin() {
                       </p>
                     ) : null}
                   </article>
-                ))}
+                  )
+                })}
               </div>
             )
           ) : sortedClients.length === 0 ? (
@@ -1323,7 +1439,7 @@ export default function Admin() {
                 return (
                   <article
                     key={client.id}
-                    className="rounded-[1.7rem] border border-white/10 bg-white p-6 text-slate-900 shadow-[0_24px_80px_rgba(0,0,0,0.18)]"
+                    className={surfaceCardClass}
                   >
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                       <div>
@@ -1336,7 +1452,7 @@ export default function Admin() {
                         </p>
                       </div>
 
-                      <div className="rounded-[1.2rem] bg-slate-50 px-4 py-3 text-right">
+                      <div className={`${surfaceMetricClass} text-right`}>
                         <div className="text-[0.72rem] font-extrabold uppercase tracking-[0.18em] text-slate-400">
                           Website status
                         </div>
@@ -1361,17 +1477,17 @@ export default function Admin() {
                               <ArrowUpRight className="h-4 w-4" />
                             </a>
                           ) : (
-                            "—"
+                            "--"
                           )
                         }
                       />
                       <DetailItem
                         label="Subscription"
-                        value={client.subscription_status || "—"}
+                        value={client.subscription_status || "--"}
                       />
                       <DetailItem
                         label="Last invoice"
-                        value={client.last_invoice_status || "—"}
+                        value={client.last_invoice_status || "--"}
                       />
                       <DetailItem
                         label="Current period end"
@@ -1386,7 +1502,7 @@ export default function Admin() {
                                   ? ` / ${currency.format(Number(client.last_payment_amount))}`
                                   : ""
                               }`
-                            : "—"
+                            : "--"
                         }
                       />
                       <DetailItem
@@ -1419,11 +1535,11 @@ export default function Admin() {
                       </div>
                     ) : null}
 
-                    <div className="mt-6 flex flex-wrap gap-3">
+                    <div className={surfaceFooterClass}>
                       <button
                         onClick={() => void updateWebsiteInfo(client.id, client)}
                         disabled={busyId === client.id}
-                        className={buttonClass.secondary.replace("text-white", "text-slate-950").replace("bg-white/8", "bg-slate-100").replace("border-white/14", "border-slate-200")}
+                        className={surfaceButtonClass}
                       >
                         <Globe className="h-4 w-4" />
                         Edit website info
@@ -1432,7 +1548,7 @@ export default function Admin() {
                       <button
                         onClick={() => void generatePortalLink(client.id)}
                         disabled={busyId === client.id}
-                        className={buttonClass.secondary.replace("text-white", "text-slate-950").replace("bg-white/8", "bg-slate-100").replace("border-white/14", "border-slate-200")}
+                        className={surfaceButtonClass}
                       >
                         <CreditCard className="h-4 w-4" />
                         {busyId === client.id ? "Working..." : "Open billing portal"}
@@ -1441,7 +1557,7 @@ export default function Admin() {
                       <button
                         onClick={() => void sendManualReminder(client.id)}
                         disabled={busyId === client.id}
-                        className={buttonClass.primary}
+                        className={surfacePrimaryButtonClass}
                       >
                         {busyId === client.id ? "Working..." : "Send reminder"}
                       </button>
@@ -1449,7 +1565,7 @@ export default function Admin() {
                       <button
                         onClick={() => void markClientWebsiteStatus(client.id, "paused")}
                         disabled={busyId === client.id}
-                        className={buttonClass.secondary.replace("text-white", "text-slate-950").replace("bg-white/8", "bg-slate-100").replace("border-white/14", "border-slate-200")}
+                        className={surfaceButtonClass}
                       >
                         Mark paused
                       </button>
@@ -1471,8 +1587,8 @@ export default function Admin() {
         </div>
 
         {editingInquiry && inquiryForm ? (
-          <div className="fixed inset-0 z-[80] flex items-start justify-center overflow-y-auto bg-slate-950/45 px-4 py-6 sm:px-6">
-            <div className="w-full max-w-4xl rounded-[1.8rem] border border-slate-200 bg-white p-6 text-slate-900 shadow-[0_30px_120px_rgba(15,23,42,0.22)] sm:p-8">
+          <div className="fixed inset-0 z-[80] flex items-start justify-center overflow-y-auto bg-slate-950/55 px-4 py-6 backdrop-blur-sm sm:px-6">
+            <div className={`${surfaceCardClass} w-full max-w-4xl sm:p-8`}>
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
@@ -1501,7 +1617,7 @@ export default function Admin() {
                 </button>
               </div>
 
-              <div className="mt-6 rounded-[1.4rem] border border-slate-200 bg-slate-50/90 px-4 py-4 text-sm leading-7 text-slate-600">
+              <div className="mt-6 rounded-[1.4rem] border border-slate-200/80 bg-slate-50/90 px-4 py-4 text-sm leading-7 text-slate-600">
                 <span className="font-extrabold text-slate-900">Package snapshot:</span>{" "}
                 {editingInquiry.plan_name}
                 {editingInquiry.selected_addons?.length
@@ -1670,7 +1786,7 @@ export default function Admin() {
                   </div>
                 ) : null}
 
-                <div className="flex flex-col gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-col gap-3 rounded-[1.35rem] border border-slate-200/80 bg-slate-50/85 p-3 sm:flex-row sm:items-center sm:justify-between">
                   <button
                     type="button"
                     onClick={closeInquiryEditor}
@@ -1682,7 +1798,7 @@ export default function Admin() {
                   <button
                     type="submit"
                     disabled={busyId === `inquiry-save:${editingInquiry.id}`}
-                    className="inline-flex items-center justify-center gap-2 rounded-full border border-transparent bg-slate-950 px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                    className={surfacePrimaryButtonClass}
                   >
                     <Pencil className="h-4 w-4" />
                     {busyId === `inquiry-save:${editingInquiry.id}`
@@ -1694,6 +1810,7 @@ export default function Admin() {
             </div>
           </div>
         ) : null}
-      </main>
-    )
-  }
+      </>
+    </AdminShell>
+  )
+}

@@ -135,17 +135,26 @@ const demoOptions = [
   "home-remodeling",
 ]
 
+const surfaceCardClass =
+  "rounded-[1.85rem] border border-slate-200/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.985),rgba(247,250,252,0.96))] p-6 text-slate-900 shadow-[0_24px_80px_rgba(15,23,42,0.14)]"
+
+const surfaceMetricClass =
+  "rounded-[1.3rem] border border-slate-200/75 bg-white/80 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]"
+
+const surfaceFooterClass =
+  "mt-5 flex flex-wrap gap-3 rounded-[1.3rem] border border-slate-200/75 bg-slate-50/85 p-3"
+
 const fieldClass =
-  "w-full rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-300 focus:ring-4 focus:ring-slate-100"
+  "w-full rounded-[1rem] border border-slate-200/80 bg-slate-50/80 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-300 focus:bg-white focus:ring-4 focus:ring-slate-100"
 
 const surfaceButtonClass =
-  "inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-slate-100 px-4 py-2.5 text-sm font-bold text-slate-950 transition hover:-translate-y-0.5 hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
+  "inline-flex items-center justify-center gap-2 rounded-full border border-slate-200/90 bg-white px-4 py-2.5 text-sm font-bold text-slate-800 shadow-[0_10px_26px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
 
 const primaryButtonClass =
-  "inline-flex items-center justify-center gap-2 rounded-full border border-transparent bg-slate-950 px-4 py-2.5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+  "inline-flex items-center justify-center gap-2 rounded-full border border-slate-950/10 bg-slate-950 px-4 py-2.5 text-sm font-bold text-white shadow-[0_16px_30px_rgba(15,23,42,0.16)] transition hover:-translate-y-0.5 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
 
 const dangerButtonClass =
-  "inline-flex items-center justify-center gap-2 rounded-full border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-bold text-red-700 transition hover:-translate-y-0.5 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+  "inline-flex items-center justify-center gap-2 rounded-full border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-bold text-red-700 shadow-[0_12px_26px_rgba(248,113,113,0.14)] transition hover:-translate-y-0.5 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
 
 function formatDate(value: string | null | undefined, fallback = "--") {
   return value ? new Date(value).toLocaleString() : fallback
@@ -163,19 +172,20 @@ function MetricCard({
   description: string
 }) {
   return (
-    <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.06] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.14)]">
+    <div className="relative overflow-hidden rounded-[1.65rem] border border-white/12 bg-[linear-gradient(180deg,rgba(255,255,255,0.11),rgba(255,255,255,0.05))] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.22)] backdrop-blur-xl">
+      <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white/35 to-transparent" />
       <div className="flex items-start justify-between gap-4">
         <div>
-          <div className="text-[0.72rem] font-extrabold uppercase tracking-[0.18em] text-slate-400">
+          <div className="text-[0.72rem] font-extrabold uppercase tracking-[0.18em] text-slate-300/80">
             {label}
           </div>
           <div className="mt-3 text-3xl font-extrabold tracking-[-0.05em] text-white">
             {value}
           </div>
-          <p className="mt-2 text-sm leading-7 text-slate-300">{description}</p>
+          <p className="mt-2 text-sm leading-7 text-slate-200/85">{description}</p>
         </div>
 
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 text-slate-100">
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/12 text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
           {icon}
         </div>
       </div>
@@ -185,7 +195,7 @@ function MetricCard({
 
 function EmptyState({ message }: { message: string }) {
   return (
-    <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.06] px-5 py-5 text-sm leading-7 text-slate-300 shadow-[0_18px_50px_rgba(0,0,0,0.12)]">
+    <div className="rounded-[1.4rem] border border-slate-200/80 bg-slate-50/80 px-5 py-5 text-sm leading-7 text-slate-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.72)]">
       {message}
     </div>
   )
@@ -228,6 +238,8 @@ export default function OutreachPanel() {
 
   useEffect(() => {
     void loadDashboard()
+    // loadDashboard is intentionally triggered once on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const pendingDrafts = data?.pendingDrafts ?? []
@@ -452,13 +464,13 @@ export default function OutreachPanel() {
       </div>
 
       {actionMessage ? (
-        <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.08] px-5 py-4 text-sm font-semibold text-slate-100 shadow-[0_18px_50px_rgba(0,0,0,0.12)]">
+        <div className="rounded-[1.5rem] border border-white/12 bg-white/[0.08] px-5 py-4 text-sm font-semibold text-slate-100 shadow-[0_18px_50px_rgba(0,0,0,0.12)] backdrop-blur-xl">
           {actionMessage}
         </div>
       ) : null}
 
       <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <div className="rounded-[1.7rem] border border-white/10 bg-white p-6 text-slate-900 shadow-[0_24px_80px_rgba(0,0,0,0.18)]">
+        <div className={surfaceCardClass}>
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <div className="text-[0.74rem] font-extrabold uppercase tracking-[0.18em] text-slate-400">
@@ -513,7 +525,7 @@ export default function OutreachPanel() {
           </div>
 
           <div className="mt-6 grid gap-4 md:grid-cols-2">
-            <div className="rounded-[1.25rem] border border-slate-200 bg-slate-50 px-4 py-4">
+            <div className={surfaceMetricClass}>
               <div className="text-[0.72rem] font-extrabold uppercase tracking-[0.18em] text-slate-400">
                 Status
               </div>
@@ -525,7 +537,7 @@ export default function OutreachPanel() {
               </p>
             </div>
 
-            <div className="rounded-[1.25rem] border border-slate-200 bg-slate-50 px-4 py-4">
+            <div className={surfaceMetricClass}>
               <div className="text-[0.72rem] font-extrabold uppercase tracking-[0.18em] text-slate-400">
                 Guardrails
               </div>
@@ -732,7 +744,7 @@ export default function OutreachPanel() {
               />
             </label>
 
-            <div className="md:col-span-2">
+            <div className="md:col-span-2 rounded-[1.3rem] border border-slate-200/75 bg-slate-50/85 p-3">
               <button
                 type="submit"
                 disabled={busyId === "save-settings"}
@@ -746,7 +758,7 @@ export default function OutreachPanel() {
         </div>
 
         <div className="space-y-6">
-          <div className="rounded-[1.7rem] border border-white/10 bg-white p-6 text-slate-900 shadow-[0_24px_80px_rgba(0,0,0,0.18)]">
+          <div className={surfaceCardClass}>
             <div className="text-[0.74rem] font-extrabold uppercase tracking-[0.18em] text-slate-400">
               Needs contact info
             </div>
@@ -760,7 +772,7 @@ export default function OutreachPanel() {
                 needsContactProspects.map((prospect) => (
                   <div
                     key={prospect.id}
-                    className="rounded-[1.25rem] border border-slate-200 bg-slate-50 px-4 py-4"
+                    className="rounded-[1.25rem] border border-slate-200/80 bg-slate-50/80 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]"
                   >
                     <div className="font-extrabold tracking-[-0.02em] text-slate-950">
                       {prospect.business_name}
@@ -779,7 +791,7 @@ export default function OutreachPanel() {
             </div>
           </div>
 
-          <div className="rounded-[1.7rem] border border-white/10 bg-white p-6 text-slate-900 shadow-[0_24px_80px_rgba(0,0,0,0.18)]">
+          <div className={surfaceCardClass}>
             <div className="text-[0.74rem] font-extrabold uppercase tracking-[0.18em] text-slate-400">
               Recent events
             </div>
@@ -790,7 +802,7 @@ export default function OutreachPanel() {
                 recentEvents.map((event) => (
                   <div
                     key={event.id}
-                    className="rounded-[1.2rem] border border-slate-200 bg-slate-50 px-4 py-3"
+                    className="rounded-[1.2rem] border border-slate-200/80 bg-slate-50/80 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]"
                   >
                     <div className="text-sm font-extrabold text-slate-950">
                       {event.event_type}
@@ -807,7 +819,7 @@ export default function OutreachPanel() {
       </section>
 
       <section className="space-y-6">
-        <div className="rounded-[1.7rem] border border-white/10 bg-white p-6 text-slate-900 shadow-[0_24px_80px_rgba(0,0,0,0.18)]">
+        <div className={surfaceCardClass}>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <div className="text-[0.74rem] font-extrabold uppercase tracking-[0.18em] text-slate-400">
@@ -830,7 +842,7 @@ export default function OutreachPanel() {
               pendingDrafts.map((draft) => (
                 <article
                   key={draft.id}
-                  className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5"
+                  className="rounded-[1.55rem] border border-slate-200/80 bg-slate-50/85 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]"
                 >
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                     <div>
@@ -857,13 +869,13 @@ export default function OutreachPanel() {
                       </p>
                     </div>
 
-                    <div className="rounded-[1.15rem] border border-slate-200 bg-white px-4 py-3 text-sm leading-7 text-slate-600">
+                    <div className={`${surfaceMetricClass} text-sm leading-7 text-slate-600`}>
                       <div className="font-extrabold text-slate-950">Created</div>
                       <div>{formatDate(draft.created_at)}</div>
                     </div>
                   </div>
 
-                  <div className="mt-5 rounded-[1.2rem] border border-slate-200 bg-white px-4 py-4">
+                  <div className="mt-5 rounded-[1.2rem] border border-slate-200/80 bg-white px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]">
                     <div className="text-[0.72rem] font-extrabold uppercase tracking-[0.18em] text-slate-400">
                       Subject
                     </div>
@@ -876,7 +888,7 @@ export default function OutreachPanel() {
                   </div>
 
                   {draft.personalization_summary ? (
-                    <div className="mt-4 rounded-[1.2rem] border border-slate-200 bg-white px-4 py-4 text-sm leading-7 text-slate-600">
+                    <div className="mt-4 rounded-[1.2rem] border border-slate-200/80 bg-white px-4 py-4 text-sm leading-7 text-slate-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]">
                       <div className="font-extrabold text-slate-950">
                         Personalization note
                       </div>
@@ -890,7 +902,7 @@ export default function OutreachPanel() {
                     </div>
                   ) : null}
 
-                  <div className="mt-5 flex flex-wrap gap-3">
+                  <div className={surfaceFooterClass}>
                     <button
                       onClick={() => setEditor(createDraftEditorForm(draft))}
                       disabled={busyId === `edit:${draft.id}`}
@@ -928,7 +940,7 @@ export default function OutreachPanel() {
           </div>
         </div>
 
-        <div className="rounded-[1.7rem] border border-white/10 bg-white p-6 text-slate-900 shadow-[0_24px_80px_rgba(0,0,0,0.18)]">
+        <div className={surfaceCardClass}>
           <div className="text-[0.74rem] font-extrabold uppercase tracking-[0.18em] text-slate-400">
             Recently sent
           </div>
@@ -939,7 +951,7 @@ export default function OutreachPanel() {
               recentSentDrafts.map((draft) => (
                 <div
                   key={draft.id}
-                  className="rounded-[1.2rem] border border-slate-200 bg-slate-50 px-4 py-4"
+                  className="rounded-[1.2rem] border border-slate-200/80 bg-slate-50/80 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]"
                 >
                   <div className="font-extrabold text-slate-950">
                     {draft.prospect?.business_name || draft.recipient_email}
@@ -956,8 +968,8 @@ export default function OutreachPanel() {
       </section>
 
       {editor ? (
-        <div className="fixed inset-0 z-[85] flex items-start justify-center overflow-y-auto bg-slate-950/45 px-4 py-6 sm:px-6">
-          <div className="w-full max-w-4xl rounded-[1.8rem] border border-slate-200 bg-white p-6 text-slate-900 shadow-[0_30px_120px_rgba(15,23,42,0.22)] sm:p-8">
+        <div className="fixed inset-0 z-[85] flex items-start justify-center overflow-y-auto bg-slate-950/55 px-4 py-6 backdrop-blur-sm sm:px-6">
+          <div className={`${surfaceCardClass} w-full max-w-4xl sm:p-8`}>
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="text-[0.74rem] font-extrabold uppercase tracking-[0.18em] text-slate-400">
@@ -1063,7 +1075,7 @@ export default function OutreachPanel() {
                 />
               </label>
 
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-3 rounded-[1.3rem] border border-slate-200/75 bg-slate-50/85 p-3">
                 <button
                   type="submit"
                   disabled={busyId === `edit:${editor.draftId}`}
