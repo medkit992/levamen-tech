@@ -14,7 +14,7 @@ import {
   X,
   XCircle,
 } from "lucide-react"
-import { supabase } from "../../lib/supabase"
+import { getFunctionAuthHeaders, supabase } from "../../lib/supabase"
 
 type OutreachSettings = {
   enabled: boolean
@@ -240,8 +240,10 @@ export default function OutreachPanel() {
   }, [settingsForm])
 
   async function callAction(body: Record<string, unknown>) {
+    const headers = await getFunctionAuthHeaders()
     const { data, error } = await supabase.functions.invoke("outreach-admin", {
       body,
+      headers,
     })
 
     if (error) {

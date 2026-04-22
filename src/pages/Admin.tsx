@@ -17,7 +17,7 @@ import {
   X,
 } from "lucide-react"
 import OutreachPanel from "../components/admin/OutreachPanel"
-import { supabase } from "../lib/supabase"
+import { getFunctionAuthHeaders, supabase } from "../lib/supabase"
 
 type ReviewRow = {
   id: string
@@ -411,8 +411,10 @@ export default function Admin() {
   }, [clients])
 
   async function callAdminAction(action: AdminAction) {
+    const headers = await getFunctionAuthHeaders()
     const { data, error } = await supabase.functions.invoke("admin-dashboard", {
       body: action,
+      headers,
     })
 
     if (error) {
