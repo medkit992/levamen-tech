@@ -1,6 +1,7 @@
 import { useMemo, useState, type ChangeEvent, type ReactNode } from "react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
+import Seo from "../components/seo/Seo";
 import {
   ArrowLeft,
   ArrowRight,
@@ -12,6 +13,11 @@ import {
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
+import {
+  buildBreadcrumbStructuredData,
+  buildWebPageStructuredData,
+  siteConfig,
+} from "../seo/site";
 
 type PlanKey = "starter" | "growth" | "premium";
 
@@ -143,6 +149,44 @@ const ADDONS: Record<
     description: "Faster response times for updates and support requests.",
   },
 };
+
+const pricingPageTitle = "Website Pricing and Packages for Service Businesses";
+const pricingPageDescription =
+  "Compare Levamen Tech website packages, customize your plan with add-ons, and send a project request for review before any payment is collected.";
+
+const pricingStructuredData = [
+  buildWebPageStructuredData({
+    path: "/pricing",
+    title: pricingPageTitle,
+    description: pricingPageDescription,
+  }),
+  buildBreadcrumbStructuredData([
+    { name: "Home", path: "/" },
+    { name: "Pricing", path: "/pricing" },
+  ]),
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: "Custom website design and development",
+    description: pricingPageDescription,
+    provider: {
+      "@id": `${siteConfig.url}/#organization`,
+    },
+    areaServed: "United States",
+    serviceType: "Service business website design",
+    offers: VALID_PLAN_KEYS.map((planKey) => {
+      const plan = PLAN_DETAILS[planKey];
+
+      return {
+        "@type": "Offer",
+        name: `${plan.name} Website Package`,
+        priceCurrency: "USD",
+        price: plan.setupPrice,
+        description: `${plan.description} Monthly maintenance starts at ${plan.monthlyPrice} per month.`,
+      };
+    }),
+  },
+];
 
 function StepShell({
   title,
@@ -334,8 +378,21 @@ export default function Pricing() {
   };
 
   return (
-    <section className="section pt-8 sm:pt-10">
-      <div className="container-custom">
+    <>
+      <Seo
+        title={pricingPageTitle}
+        description={pricingPageDescription}
+        path="/pricing"
+        keywords={[
+          "website pricing for service businesses",
+          "small business website packages",
+          "web design pricing",
+          "website maintenance plans",
+        ]}
+        structuredData={pricingStructuredData}
+      />
+      <section className="section pt-8 sm:pt-10">
+        <div className="container-custom">
         <div className="mb-8 grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
           <div>
             <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-white px-4 py-2 text-sm text-[var(--color-text-muted)] soft-shadow">
@@ -1162,7 +1219,8 @@ export default function Pricing() {
             </div>
           </aside>
         </div>
-      </div>
-    </section>
+        </div>
+      </section>
+    </>
   );
 }

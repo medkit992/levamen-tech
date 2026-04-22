@@ -17,6 +17,7 @@ import {
   X,
 } from "lucide-react"
 import OutreachPanel from "../components/admin/OutreachPanel"
+import Seo from "../components/seo/Seo"
 import { invokeProtectedFunction, supabase } from "../lib/supabase"
 
 type ReviewRow = {
@@ -1050,6 +1051,12 @@ export default function Admin() {
 
   return (
     <AdminShell>
+      <Seo
+        title="Admin Dashboard"
+        description="Levamen Tech internal admin dashboard."
+        path="/admin"
+        noindex
+      />
       <>
         <div className="space-y-6">
           <div className={heroPanelClass}>

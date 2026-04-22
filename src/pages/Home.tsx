@@ -1,6 +1,12 @@
 import { BrushCleaning, LayoutTemplate, MessageSquareQuote, Rocket } from "lucide-react"
+import Seo from "../components/seo/Seo"
 import PricingPreview from "../components/pricing/PricingPreview"
 import Hero from "../components/sections/Hero"
+import {
+  buildOrganizationStructuredData,
+  buildWebPageStructuredData,
+  buildWebsiteStructuredData,
+} from "../seo/site"
 
 const pillars = [
   {
@@ -29,9 +35,35 @@ const pillars = [
   },
 ]
 
+const pageTitle = "Custom Websites for Service Businesses"
+const pageDescription =
+  "Levamen Tech builds custom websites for service businesses with clean branding, responsive layouts, clear structure, and conversion-focused polish."
+
+const homeStructuredData = [
+  buildWebsiteStructuredData(),
+  buildOrganizationStructuredData(pageDescription),
+  buildWebPageStructuredData({
+    path: "/",
+    title: pageTitle,
+    description: pageDescription,
+  }),
+]
+
 export default function Home() {
   return (
     <>
+      <Seo
+        title={pageTitle}
+        description={pageDescription}
+        path="/"
+        keywords={[
+          "custom websites for service businesses",
+          "small business web design",
+          "website design for contractors",
+          "service business website development",
+        ]}
+        structuredData={homeStructuredData}
+      />
       <Hero
         eyebrow="Premium websites for service businesses"
         title="Custom websites with a sunset-to-sea feel"

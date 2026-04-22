@@ -8,6 +8,12 @@ import {
   Sparkles,
 } from "lucide-react"
 import headshot from "../assets/images/andrew-headshot.jpg"
+import Seo from "../components/seo/Seo"
+import {
+  buildBreadcrumbStructuredData,
+  buildWebPageStructuredData,
+  siteConfig,
+} from "../seo/site"
 
 const contactMethods = [
   {
@@ -49,10 +55,51 @@ const goodFit = [
   "A developer who can actually customize things",
 ]
 
+const pageTitle = "Contact Levamen Tech"
+const pageDescription =
+  "Reach out to Levamen Tech about a custom website project, pricing questions, demo requests, or a new service business site."
+
+const contactStructuredData = [
+  buildWebPageStructuredData({
+    path: "/contact",
+    title: pageTitle,
+    description: pageDescription,
+    pageType: "ContactPage",
+  }),
+  buildBreadcrumbStructuredData([
+    { name: "Home", path: "/" },
+    { name: "Contact", path: "/contact" },
+  ]),
+  {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    name: `${siteConfig.name} contact page`,
+    url: `${siteConfig.url}/contact`,
+    description: pageDescription,
+    mainEntity: {
+      "@id": `${siteConfig.url}/#organization`,
+    },
+  },
+]
+
 export default function Contact() {
   return (
-    <section className="section pt-8 sm:pt-10">
-      <div className="container-custom">
+    <>
+      <Seo
+        title={pageTitle}
+        description={pageDescription}
+        path="/contact"
+        image="/og-default.svg"
+        keywords={[
+          "contact web designer",
+          "service business website designer",
+          "custom website project inquiry",
+          "Levamen Tech contact",
+        ]}
+        structuredData={contactStructuredData}
+      />
+      <section className="section pt-8 sm:pt-10">
+        <div className="container-custom">
         <div className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr]">
           <div className="space-y-8">
             <div className="section-panel px-6 py-8 sm:px-8 lg:px-10">
@@ -254,7 +301,8 @@ export default function Contact() {
             </div>
           </div>
         </div>
-      </div>
-    </section>
+        </div>
+      </section>
+    </>
   )
 }

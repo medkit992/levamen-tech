@@ -1,8 +1,18 @@
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
+import Seo from "../seo/Seo"
 import type { DemoPageData } from "../../types/demo"
+import {
+  buildBreadcrumbStructuredData,
+  buildFaqStructuredData,
+  buildWebPageStructuredData,
+} from "../../seo/site"
 import DemoPreview from "./DemoPreview"
 
 type Props = DemoPageData
+
+type DemoPageTemplateProps = Props & {
+  canonicalPath?: string
+}
 
 export default function DemoPageTemplate({
   businessName,
@@ -33,7 +43,27 @@ export default function DemoPageTemplate({
   finalCtaPrimaryText,
   finalCtaSecondaryText,
   theme,
-}: Props) {
+  canonicalPath,
+}: DemoPageTemplateProps) {
+  const locationPath = useLocation().pathname
+  const pagePath = canonicalPath ?? locationPath
+  const pageTitle = `${businessName} ${industryLabel} Website Demo`
+  const pageDescription = `${heroDescription} Explore this ${industryLabel.toLowerCase()} website demo from Levamen Tech${location ? ` for ${location}` : ""}.`
+
+  const structuredData = [
+    buildWebPageStructuredData({
+      path: pagePath,
+      title: pageTitle,
+      description: pageDescription,
+    }),
+    buildBreadcrumbStructuredData([
+      { name: "Home", path: "/" },
+      { name: "Demos", path: "/demos" },
+      { name: businessName, path: pagePath },
+    ]),
+    buildFaqStructuredData(faqs),
+  ]
+
   const renderHeroTitle = () => {
     if (!heroGradientWord || !heroTitle.includes(heroGradientWord)) {
       return heroTitle
@@ -59,6 +89,18 @@ export default function DemoPageTemplate({
 
   return (
     <div className="overflow-hidden px-4 pt-6 sm:px-8 sm:pt-10 lg:px-12">
+      <Seo
+        title={pageTitle}
+        description={pageDescription}
+        path={pagePath}
+        structuredData={structuredData}
+        keywords={[
+          `${industryLabel.toLowerCase()} website demo`,
+          `${industryLabel.toLowerCase()} website design`,
+          `${businessName.toLowerCase()} demo`,
+          "service business website example",
+        ]}
+      />
       <section className="container-custom">
         <div
           className="section-panel px-5 py-8 sm:px-10 sm:py-10 lg:px-14 lg:py-14"

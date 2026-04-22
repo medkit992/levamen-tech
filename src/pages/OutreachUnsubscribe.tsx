@@ -1,6 +1,7 @@
 import { MailCheck, MailWarning, ShieldBan } from "lucide-react"
 import { useMemo, useState } from "react"
 import { useSearchParams } from "react-router-dom"
+import Seo from "../components/seo/Seo"
 import { supabase } from "../lib/supabase"
 
 type RequestState = "idle" | "loading" | "success" | "error"
@@ -47,8 +48,15 @@ export default function OutreachUnsubscribe() {
   }
 
   return (
-    <section className="section pt-8 sm:pt-10">
-      <div className="container-custom">
+    <>
+      <Seo
+        title="Unsubscribe from Outreach"
+        description="Email preference update page for Levamen Tech outreach."
+        path="/unsubscribe"
+        noindex
+      />
+      <section className="section pt-8 sm:pt-10">
+        <div className="container-custom">
         <div className="section-panel px-6 py-8 sm:px-10 lg:px-14 lg:py-12">
           <div className="max-w-3xl">
             <div className="section-kicker">
@@ -118,7 +126,8 @@ export default function OutreachUnsubscribe() {
             </aside>
           </div>
         </div>
-      </div>
-    </section>
+        </div>
+      </section>
+    </>
   )
 }

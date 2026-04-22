@@ -1,6 +1,8 @@
+import { Suspense } from "react"
 import { Outlet } from "react-router-dom"
 import Footer from "./Footer"
 import Navbar from "./Navbar"
+import RouteLoader from "./RouteLoader"
 import ScrollToTop from "./ScrollToTop"
 
 export default function PageLayout() {
@@ -15,7 +17,9 @@ export default function PageLayout() {
       </a>
       <Navbar />
       <main id="main-content" className="relative z-10 flex-1">
-        <Outlet />
+        <Suspense fallback={<RouteLoader preserveLayout />}>
+          <Outlet />
+        </Suspense>
       </main>
       <Footer />
     </div>

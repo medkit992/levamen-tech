@@ -2,6 +2,12 @@ import { useEffect, useState } from "react"
 import { Building2, MessageSquareQuote, Sparkles, Star } from "lucide-react"
 import ReviewFormCard from "../components/reviews/ReviewFormCard"
 import { supabase } from "../lib/supabase"
+import Seo from "../components/seo/Seo"
+import {
+  buildBreadcrumbStructuredData,
+  buildWebPageStructuredData,
+  siteConfig,
+} from "../seo/site"
 
 type Review = {
   id: string
@@ -86,6 +92,10 @@ const ReviewCard = ({
   </article>
 )
 
+const pageTitle = "Client Reviews and Testimonials"
+const pageDescription =
+  "Read Levamen Tech client reviews and testimonials, and see how service businesses describe the website design and launch experience."
+
 const Reviews = () => {
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
@@ -112,8 +122,71 @@ const Reviews = () => {
       ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
       : 5
 
+  const reviewStructuredData = [
+    buildWebPageStructuredData({
+      path: "/reviews",
+      title: pageTitle,
+      description: pageDescription,
+      pageType: "CollectionPage",
+    }),
+    buildBreadcrumbStructuredData([
+      { name: "Home", path: "/" },
+      { name: "Reviews", path: "/reviews" },
+    ]),
+    ...(reviews.length > 0
+      ? [
+          {
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            "@id": `${siteConfig.url}/#organization`,
+            name: siteConfig.name,
+            url: siteConfig.url,
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: Number(averageRating.toFixed(1)),
+              reviewCount: reviews.length,
+              bestRating: 5,
+              worstRating: 1,
+            },
+            review: reviews.slice(0, 6).map((review) => ({
+              "@type": "Review",
+              name: review.review_headline || `Review from ${review.client_name}`,
+              reviewBody: review.review_text,
+              author: {
+                "@type": "Person",
+                name: review.client_name,
+              },
+              reviewRating: {
+                "@type": "Rating",
+                ratingValue: review.rating,
+                bestRating: 5,
+                worstRating: 1,
+              },
+              itemReviewed: {
+                "@type": "ProfessionalService",
+                name: siteConfig.name,
+              },
+            })),
+          },
+        ]
+      : []),
+  ]
+
   return (
-    <main className="min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(255,179,71,0.18),_transparent_30%),linear-gradient(180deg,#fff_0%,#f8fafc_36%,#eef4ff_100%)]">
+    <>
+      <Seo
+        title={pageTitle}
+        description={pageDescription}
+        path="/reviews"
+        keywords={[
+          "web design testimonials",
+          "client website reviews",
+          "service business website testimonials",
+          "Levamen Tech reviews",
+        ]}
+        structuredData={reviewStructuredData}
+      />
+      <div className="min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(255,179,71,0.18),_transparent_30%),linear-gradient(180deg,#fff_0%,#f8fafc_36%,#eef4ff_100%)]">
       <section className="relative px-6 pb-12 pt-10 sm:px-8 lg:px-12">
         <div className="container-custom relative">
           <div className="absolute -left-10 top-8 h-40 w-40 rounded-full bg-orange-200/40 blur-3xl" />
@@ -256,7 +329,8 @@ const Reviews = () => {
           </div>
         </div>
       </section>
-    </main>
+      </div>
+    </>
   )
 }
 

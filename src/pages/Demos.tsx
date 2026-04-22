@@ -2,7 +2,12 @@ import { ArrowRight, Compass, Sparkles } from "lucide-react"
 import { Link } from "react-router-dom"
 import DemoPreview from "../components/demos/DemoPreview"
 import Hero from "../components/sections/Hero"
+import Seo from "../components/seo/Seo"
 import { demoCatalog } from "../demos/catalog"
+import {
+  buildBreadcrumbStructuredData,
+  buildWebPageStructuredData,
+} from "../seo/site"
 import type { DemoTheme } from "../types/demo"
 
 function buildCardStyle(theme: DemoTheme) {
@@ -28,9 +33,51 @@ function buildStripeStyle(theme: DemoTheme) {
   }
 }
 
+const pageTitle = "Website Demos for Service Businesses"
+const pageDescription =
+  "Browse niche website demos for landscapers, plumbers, HVAC companies, electricians, restaurants, salons, law firms, and other service businesses."
+
+const demosStructuredData = [
+  buildWebPageStructuredData({
+    path: "/demos",
+    title: pageTitle,
+    description: pageDescription,
+    pageType: "CollectionPage",
+  }),
+  buildBreadcrumbStructuredData([
+    { name: "Home", path: "/" },
+    { name: "Demos", path: "/demos" },
+  ]),
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Levamen Tech demo library",
+    description: pageDescription,
+    itemListElement: demoCatalog.map((demo, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url: `https://levamentech.com/demos/${demo.slug}`,
+      name: demo.title,
+      description: demo.description,
+    })),
+  },
+]
+
 export default function Demos() {
   return (
     <>
+      <Seo
+        title={pageTitle}
+        description={pageDescription}
+        path="/demos"
+        keywords={[
+          "website demos for service businesses",
+          "small business website examples",
+          "contractor website demos",
+          "service business web design inspiration",
+        ]}
+        structuredData={demosStructuredData}
+      />
       <Hero
         eyebrow="Explore tailored business demo directions"
         title="Browse demos that feel built for each niche"
