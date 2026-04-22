@@ -32,6 +32,7 @@ import Success from "../pages/Success";
 import Failure from "../pages/Failure";
 import TermsOfService from "../pages/TermsOfService";
 import PrivacyPolicy from "../pages/PrivacyPolicy";
+import OutreachUnsubscribe from "../pages/OutreachUnsubscribe";
 
 export const router = createBrowserRouter([
   {
@@ -65,6 +66,7 @@ export const router = createBrowserRouter([
       { path: "/reviews", element: <Reviews /> },
       { path: "/terms", element: <TermsOfService /> },
       { path: "/privacy", element: <PrivacyPolicy /> },
+      { path: "/unsubscribe", element: <OutreachUnsubscribe /> },
       { path: "*", element: <NotFound /> },
     ],
   },

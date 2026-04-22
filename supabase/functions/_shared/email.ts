@@ -1,4 +1,4 @@
-const resendApiKey = Deno.env.get("RESEND_API_KEY") || "";
+const sharedResendApiKey = Deno.env.get("RESEND_API_KEY") || "";
 const adminFromEmail =
   Deno.env.get("ADMIN_FROM_EMAIL") || "admin@levamentech.com";
 
@@ -12,7 +12,7 @@ function parseRecipients(raw: string | undefined, fallback: string) {
 }
 
 export function isEmailDeliveryConfigured() {
-  return Boolean(resendApiKey);
+  return Boolean(sharedResendApiKey);
 }
 
 export function getAdminNotificationRecipients() {
@@ -27,32 +27,49 @@ export async function sendEmail({
   subject,
   html,
   text,
+  from,
+  replyTo,
+  apiKeyOverride,
 }: {
   to: string[];
   subject: string;
   html: string;
   text?: string;
+  from?: string;
+  replyTo?: string | string[];
+  apiKeyOverride?: string;
 }) {
+  const resendApiKey = apiKeyOverride || sharedResendApiKey;
+
   if (!resendApiKey) {
     return {
       delivered: false,
       skipped: true,
       error: "RESEND_API_KEY is not configured.",
+      id: null,
     };
   }
+
+  const normalizedReplyTo = Array.isArray(replyTo)
+    ? replyTo.filter(Boolean)
+    : replyTo
+      ? [replyTo]
+      : [];
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${resendApiKey}`,
       "Content-Type": "application/json",
+      "User-Agent": "levamen-tech-outreach/1.0",
     },
     body: JSON.stringify({
-      from: `Levamen Tech <${adminFromEmail}>`,
+      from: from || `Levamen Tech <${adminFromEmail}>`,
       to,
       subject,
       html,
       text,
+      reply_to: normalizedReplyTo.length > 0 ? normalizedReplyTo : undefined,
     }),
   });
 
@@ -61,13 +78,17 @@ export async function sendEmail({
       delivered: false,
       skipped: false,
       error: await response.text(),
+      id: null,
     };
   }
+
+  const payload = await response.json().catch(() => ({}));
 
   return {
     delivered: true,
     skipped: false,
     error: null,
+    id: typeof payload?.id === "string" ? payload.id : null,
   };
 }
 
@@ -87,4 +108,3 @@ export async function sendAdminAlert({
     text,
   });
 }
-

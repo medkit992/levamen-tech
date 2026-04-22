@@ -16,6 +16,7 @@ import {
   Users,
   X,
 } from "lucide-react"
+import OutreachPanel from "../components/admin/OutreachPanel"
 import { supabase } from "../lib/supabase"
 
 type ReviewRow = {
@@ -113,7 +114,7 @@ type ClientRow = {
   updated_at: string
 }
 
-type TabKey = "reviews" | "requests" | "clients"
+type TabKey = "reviews" | "requests" | "clients" | "outreach"
 type ButtonTone = "primary" | "secondary" | "danger"
 type AdminAction =
   | { action: "load" }
@@ -961,9 +962,9 @@ export default function Admin() {
                 Admin panel
               </h1>
               <p className="mt-4 max-w-2xl text-base leading-8 text-slate-200">
-                Manage reviews, pricing requests, and client billing status from
-                one place. The workflows stay the same, but the screen is tuned
-                for faster scanning and fewer missed details.
+                Manage reviews, pricing requests, client billing, and outreach
+                approvals from one place. The workflows stay the same, but the
+                screen is tuned for faster scanning and fewer missed details.
               </p>
             </div>
 
@@ -1015,6 +1016,7 @@ export default function Admin() {
               { key: "reviews" as const, label: `Reviews (${pendingReviews.length} pending)` },
               { key: "requests" as const, label: `Requests (${inquiries.length})` },
               { key: "clients" as const, label: `Clients (${clients.length})` },
+              { key: "outreach" as const, label: "Outreach" },
             ].map((item) => (
               <button
                 key={item.key}
@@ -1051,6 +1053,8 @@ export default function Admin() {
         <div className="mt-6">
           {dataLoading ? (
             <EmptyState message="Loading admin data..." />
+          ) : tab === "outreach" ? (
+            <OutreachPanel />
           ) : tab === "reviews" ? (
             reviews.length === 0 ? (
               <EmptyState message="No reviews found." />

@@ -1,0 +1,53 @@
+name: Outreach automation
+
+on:
+  schedule:
+    - cron: "10 16 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: outreach-automation
+  cancel-in-progress: false
+
+jobs:
+  run-outreach-automation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Request GitHub OIDC token
+        id: oidc
+        shell: bash
+        env:
+          AUDIENCE: levamen-tech-outreach-cron
+        run: |
+          set -euo pipefail
+
+          response="$(curl --fail-with-body -sS \
+            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=${AUDIENCE}")"
+
+          token="$(printf '%s' "$response" | python3 -c 'import json,sys; print(json.load(sys.stdin)["value"])')"
+
+          if [[ -z "$token" || "$token" == "null" ]]; then
+            echo "GitHub OIDC token request failed." >&2
+            exit 1
+          fi
+
+          echo "::add-mask::$token"
+          echo "token=$token" >> "$GITHUB_OUTPUT"
+
+      - name: Run outreach automation
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl --fail-with-body -sS \
+            -X POST \
+            -H "Content-Type: application/json" \
+            -H "x-github-oidc-token: ${{ steps.oidc.outputs.token }}" \
+            -d '{"mode":"daily"}' \
+            "https://gglscjvpenbbgtmvwler.supabase.co/functions/v1/process-outreach-automation"
