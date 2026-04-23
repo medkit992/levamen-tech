@@ -55,6 +55,12 @@ const goodFit = [
   "A developer who can actually customize things",
 ]
 
+const builderTraits = [
+  "Direct collaboration",
+  "Custom visual direction",
+  "Responsive from the start",
+]
+
 const pageTitle = "Contact Levamen Tech"
 const pageDescription =
   "Reach out to Levamen Tech about a custom website project, pricing questions, demo requests, or a new service business site."
@@ -100,207 +106,239 @@ export default function Contact() {
       />
       <section className="section pt-8 sm:pt-10">
         <div className="container-custom">
-        <div className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr]">
-          <div className="space-y-8">
-            <div className="section-panel px-6 py-8 sm:px-8 lg:px-10">
-              <div className="grid gap-8 md:grid-cols-[320px_1fr] md:items-center">
-                <div className="relative mx-auto w-full max-w-xs sm:max-w-sm md:max-w-none">
-                  <div className="absolute inset-0 rounded-[2rem] bg-[linear-gradient(135deg,rgba(255,122,24,0.24),rgba(75,140,255,0.18))] blur-3xl" />
-                  <img
-                    src={headshot}
-                    alt="Portrait of Andrew from Levamen Tech"
-                    className="relative z-10 aspect-[4/5] w-full rounded-[2rem] object-cover shadow-[0_24px_70px_rgba(15,23,42,0.14)] ring-1 ring-white/70"
-                  />
-                </div>
+          <div className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr]">
+            <div className="space-y-8">
+              <div className="section-panel px-6 py-8 sm:px-8 lg:px-10">
+                <div className="absolute -left-12 top-8 h-36 w-36 rounded-full bg-orange-200/35 blur-3xl" />
+                <div className="absolute -right-12 bottom-6 h-44 w-44 rounded-full bg-blue-200/30 blur-3xl" />
 
-                <div className="min-w-0">
-                  <div className="section-kicker">
-                    <Sparkles className="h-3.5 w-3.5" strokeWidth={2} />
-                    Get to know the builder
-                  </div>
-
-                  <h1 className="hero-heading mt-6 text-3xl font-extrabold tracking-[-0.06em] text-slate-950 sm:text-5xl md:text-[3.4rem] md:leading-[1.02]">
-                    Let&apos;s build something that actually feels custom.
-                  </h1>
-
-                  <p className="mt-5 text-base leading-8 text-slate-600">
-                    I&apos;m the developer behind <span className="font-extrabold text-slate-900">Levamen Tech</span>.
-                    I focus on building modern websites that feel clean,
-                    intentional, and memorable instead of recycled templates that
-                    look like everything else online.
-                  </p>
-
-                  <p className="mt-4 text-base leading-8 text-slate-600">
-                    The goal is simple: give businesses a site that looks
-                    premium, works smoothly, and helps turn attention into real
-                    clients.
-                  </p>
-
-                  <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                    <a
-                      href="mailto:admin@levamentech.com"
-                      className="btn-primary !w-full sm:!w-auto"
-                    >
-                      <Send className="h-4 w-4" />
-                      Reach out
-                    </a>
-
-                    <a
-                      href="#contact-methods"
-                      className="btn-secondary !w-full sm:!w-auto"
-                    >
-                      View contact info
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-2">
-              <div className="card">
-                <h2 className="text-xl font-extrabold tracking-[-0.03em] text-slate-950">
-                  What I do
-                </h2>
-                <ul className="mt-5 space-y-3 text-sm leading-7 text-slate-600">
-                  {highlights.map((item) => (
-                    <li key={item} className="flex items-start gap-3">
-                      <span className="mt-2 h-2.5 w-2.5 rounded-full gradient-bg" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="card">
-                <h2 className="text-xl font-extrabold tracking-[-0.03em] text-slate-950">
-                  Good fit if you want
-                </h2>
-                <ul className="mt-5 space-y-3 text-sm leading-7 text-slate-600">
-                  {goodFit.map((item) => (
-                    <li key={item} className="flex items-start gap-3">
-                      <span className="mt-2 h-2.5 w-2.5 rounded-full bg-slate-900" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          <div id="contact-methods" className="space-y-6">
-            <div className="card-glass p-6 sm:p-8">
-              <div className="section-kicker">Contact details</div>
-
-              <h2 className="mt-5 text-3xl font-extrabold tracking-[-0.04em] text-slate-950">
-                Reach out directly
-              </h2>
-
-              <p className="mt-3 text-base leading-8 text-slate-600">
-                Whether you already know what you want or just want to talk
-                through possibilities, I&apos;m happy to help shape the direction.
-              </p>
-
-              <div className="mt-6 space-y-4">
-                {contactMethods.map((method) => {
-                  const Icon = method.icon
-
-                  const content = (
-                    <div className="flex items-start gap-4 rounded-[1.4rem] border border-slate-200/80 bg-white/92 p-4 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_30px_rgba(15,23,42,0.08)]">
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-700">
-                        <Icon className="h-5 w-5" />
-                      </div>
-
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold text-slate-500">
-                          {method.label}
-                        </p>
-                        <p className="mt-1 break-words text-base font-extrabold tracking-[-0.02em] text-slate-900 [overflow-wrap:anywhere]">
-                          {method.value}
-                        </p>
-                      </div>
+                <div className="relative grid gap-8 xl:grid-cols-[minmax(0,1.05fr)_minmax(280px,0.78fr)] xl:items-end">
+                  <div className="min-w-0">
+                    <div className="section-kicker">
+                      <Sparkles className="h-3.5 w-3.5" strokeWidth={2} />
+                      Get to know the builder
                     </div>
-                  )
 
-                  if (method.href) {
-                    return (
+                    <h1 className="hero-heading mt-6 max-w-2xl text-3xl font-extrabold tracking-[-0.06em] text-slate-950 sm:text-5xl md:text-[3.4rem] md:leading-[1.02]">
+                      Let&apos;s build something that actually feels custom.
+                    </h1>
+
+                    <p className="mt-5 max-w-2xl text-base leading-8 text-slate-600">
+                      I&apos;m the developer behind{" "}
+                      <span className="font-extrabold text-slate-900">Levamen Tech</span>.
+                      I focus on building modern websites that feel clean,
+                      intentional, and memorable instead of recycled templates that
+                      look like everything else online.
+                    </p>
+
+                    <p className="mt-4 max-w-2xl text-base leading-8 text-slate-600">
+                      The goal is simple: give businesses a site that looks
+                      premium, works smoothly, and helps turn attention into real
+                      clients.
+                    </p>
+
+                    <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                       <a
-                        key={method.label}
-                        href={method.href}
-                        target={method.href.startsWith("http") ? "_blank" : undefined}
-                        rel="noreferrer"
+                        href="mailto:admin@levamentech.com"
+                        className="btn-primary !w-full sm:!w-auto"
                       >
-                        {content}
+                        <Send className="h-4 w-4" />
+                        Reach out
                       </a>
-                    )
-                  }
 
-                  return <div key={method.label}>{content}</div>
-                })}
-              </div>
-            </div>
-
-            <div className="card">
-              <h2 className="text-xl font-extrabold tracking-[-0.03em] text-slate-950">
-                What happens next
-              </h2>
-
-              <div className="mt-5 space-y-4">
-                {[
-                  {
-                    step: 1,
-                    title: "You reach out",
-                    description:
-                      "Tell me about your business, idea, or what you want your site to improve.",
-                  },
-                  {
-                    step: 2,
-                    title: "We define the direction",
-                    description:
-                      "I help shape a design and structure that actually fits your brand.",
-                  },
-                  {
-                    step: 3,
-                    title: "I build it cleanly",
-                    description:
-                      "You get a polished site that feels intentional and ready to show off.",
-                  },
-                ].map((item) => (
-                  <div key={item.step} className="flex gap-4">
-                    <div className="mt-1 flex h-9 w-9 items-center justify-center rounded-full bg-slate-950 text-sm font-extrabold text-white">
-                      {item.step}
+                      <a
+                        href="#contact-methods"
+                        className="btn-secondary !w-full sm:!w-auto"
+                      >
+                        View contact info
+                      </a>
                     </div>
-                    <div>
-                      <p className="font-extrabold tracking-[-0.02em] text-slate-950">
-                        {item.title}
-                      </p>
-                      <p className="mt-1 text-sm leading-7 text-slate-600">
-                        {item.description}
-                      </p>
+
+                    <div className="mt-8 grid gap-3 text-sm text-slate-500 sm:flex sm:flex-wrap">
+                      {builderTraits.map((trait) => (
+                        <span
+                          key={trait}
+                          className="rounded-full border border-slate-200/80 bg-white/76 px-4 py-2 text-center font-semibold"
+                        >
+                          {trait}
+                        </span>
+                      ))}
                     </div>
                   </div>
-                ))}
+
+                  <div className="relative mx-auto w-full max-w-sm xl:max-w-none">
+                    <div className="absolute inset-x-5 bottom-4 top-12 rounded-[2rem] bg-[linear-gradient(135deg,rgba(255,122,24,0.2),rgba(75,140,255,0.16))] blur-3xl" />
+
+                    <div className="relative overflow-hidden rounded-[2rem] border border-white/75 bg-white/76 p-3 shadow-[0_24px_70px_rgba(15,23,42,0.12)] backdrop-blur-sm">
+                      <img
+                        src={headshot}
+                        alt="Portrait of Andrew from Levamen Tech"
+                        className="aspect-[4/5] w-full rounded-[1.7rem] object-cover shadow-[0_18px_40px_rgba(15,23,42,0.14)] ring-1 ring-white/70"
+                      />
+
+                      <div className="mt-4 rounded-[1.5rem] border border-slate-200/80 bg-white/88 p-4">
+                        <p className="text-[0.72rem] font-extrabold uppercase tracking-[0.22em] text-slate-400">
+                          Independent studio
+                        </p>
+                        <p className="mt-2 text-lg font-extrabold tracking-[-0.03em] text-slate-950">
+                          Direct contact, custom builds, and cleaner launch polish.
+                        </p>
+                        <p className="mt-2 text-sm leading-7 text-slate-600">
+                          You&apos;re talking to the person designing and building the
+                          site, which keeps feedback tight and the result more
+                          intentional.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="card">
+                  <h2 className="text-xl font-extrabold tracking-[-0.03em] text-slate-950">
+                    What I do
+                  </h2>
+                  <ul className="mt-5 space-y-3 text-sm leading-7 text-slate-600">
+                    {highlights.map((item) => (
+                      <li key={item} className="flex items-start gap-3">
+                        <span className="mt-2 h-2.5 w-2.5 rounded-full gradient-bg" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="card">
+                  <h2 className="text-xl font-extrabold tracking-[-0.03em] text-slate-950">
+                    Good fit if you want
+                  </h2>
+                  <ul className="mt-5 space-y-3 text-sm leading-7 text-slate-600">
+                    {goodFit.map((item) => (
+                      <li key={item} className="flex items-start gap-3">
+                        <span className="mt-2 h-2.5 w-2.5 rounded-full bg-slate-900" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             </div>
 
-            <div className="rounded-[1.6rem] border border-slate-200/80 bg-[linear-gradient(135deg,rgba(255,248,240,0.96),rgba(239,245,255,0.96))] p-5 shadow-[0_16px_34px_rgba(15,23,42,0.06)]">
-              <div className="flex items-start gap-4">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-slate-800 shadow-[0_10px_24px_rgba(15,23,42,0.08)]">
-                  <MapPin className="h-5 w-5" />
-                </div>
+            <div id="contact-methods" className="space-y-6">
+              <div className="card-glass p-6 sm:p-8">
+                <div className="section-kicker">Contact details</div>
 
-                <div>
-                  <h3 className="text-lg font-extrabold tracking-[-0.03em] text-slate-950">
-                    Remote-first
-                  </h3>
-                  <p className="mt-2 text-sm leading-7 text-slate-600">
-                    I work remotely and communicate online, which keeps the
-                    process simple and flexible for most clients.
-                  </p>
+                <h2 className="mt-5 text-3xl font-extrabold tracking-[-0.04em] text-slate-950">
+                  Reach out directly
+                </h2>
+
+                <p className="mt-3 text-base leading-8 text-slate-600">
+                  Whether you already know what you want or just want to talk
+                  through possibilities, I&apos;m happy to help shape the direction.
+                </p>
+
+                <div className="mt-6 space-y-4">
+                  {contactMethods.map((method) => {
+                    const Icon = method.icon
+
+                    const content = (
+                      <div className="flex items-start gap-4 rounded-[1.4rem] border border-slate-200/80 bg-white/92 p-4 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_30px_rgba(15,23,42,0.08)]">
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-700">
+                          <Icon className="h-5 w-5" />
+                        </div>
+
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-slate-500">
+                            {method.label}
+                          </p>
+                          <p className="mt-1 break-words text-base font-extrabold tracking-[-0.02em] text-slate-900 [overflow-wrap:anywhere]">
+                            {method.value}
+                          </p>
+                        </div>
+                      </div>
+                    )
+
+                    if (method.href) {
+                      return (
+                        <a
+                          key={method.label}
+                          href={method.href}
+                          target={method.href.startsWith("http") ? "_blank" : undefined}
+                          rel="noreferrer"
+                        >
+                          {content}
+                        </a>
+                      )
+                    }
+
+                    return <div key={method.label}>{content}</div>
+                  })}
+                </div>
+              </div>
+
+              <div className="card">
+                <h2 className="text-xl font-extrabold tracking-[-0.03em] text-slate-950">
+                  What happens next
+                </h2>
+
+                <div className="mt-5 space-y-4">
+                  {[
+                    {
+                      step: 1,
+                      title: "You reach out",
+                      description:
+                        "Tell me about your business, idea, or what you want your site to improve.",
+                    },
+                    {
+                      step: 2,
+                      title: "We define the direction",
+                      description:
+                        "I help shape a design and structure that actually fits your brand.",
+                    },
+                    {
+                      step: 3,
+                      title: "I build it cleanly",
+                      description:
+                        "You get a polished site that feels intentional and ready to show off.",
+                    },
+                  ].map((item) => (
+                    <div key={item.step} className="flex gap-4">
+                      <div className="mt-1 flex h-9 w-9 items-center justify-center rounded-full bg-slate-950 text-sm font-extrabold text-white">
+                        {item.step}
+                      </div>
+                      <div>
+                        <p className="font-extrabold tracking-[-0.02em] text-slate-950">
+                          {item.title}
+                        </p>
+                        <p className="mt-1 text-sm leading-7 text-slate-600">
+                          {item.description}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-[1.6rem] border border-slate-200/80 bg-[linear-gradient(135deg,rgba(255,248,240,0.96),rgba(239,245,255,0.96))] p-5 shadow-[0_16px_34px_rgba(15,23,42,0.06)]">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-slate-800 shadow-[0_10px_24px_rgba(15,23,42,0.08)]">
+                    <MapPin className="h-5 w-5" />
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-extrabold tracking-[-0.03em] text-slate-950">
+                      Remote-first
+                    </h3>
+                    <p className="mt-2 text-sm leading-7 text-slate-600">
+                      I work remotely and communicate online, which keeps the
+                      process simple and flexible for most clients.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
         </div>
       </section>
     </>
