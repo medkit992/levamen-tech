@@ -1,4 +1,5 @@
 import { FileText, Mail, ShieldCheck } from "lucide-react"
+import Seo from "../components/seo/Seo"
 
 const termsSections = [
   {
@@ -64,8 +65,15 @@ const termsSections = [
 
 export default function TermsOfService() {
   return (
-    <section className="section pt-8 sm:pt-10">
-      <div className="container-custom">
+    <>
+      <Seo
+        title="Terms of Service"
+        description="Terms of service for Levamen Tech website visitors and clients."
+        path="/terms"
+        noindex
+      />
+      <section className="section pt-8 sm:pt-10">
+        <div className="container-custom">
         <div className="section-panel px-6 py-8 sm:px-10 lg:px-14 lg:py-12">
           <div className="min-w-0 max-w-4xl">
             <div className="section-kicker">
@@ -139,7 +147,8 @@ export default function TermsOfService() {
             </aside>
           </div>
         </div>
-      </div>
-    </section>
+        </div>
+      </section>
+    </>
   )
 }

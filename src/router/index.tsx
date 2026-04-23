@@ -1,38 +1,39 @@
+import { lazy } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import PageLayout from "../components/layout/PageLayout";
 
-import Home from "../pages/Home";
-import Demos from "../pages/Demos";
-import Contact from "../pages/Contact";
-import Reviews from "../pages/Reviews";
-import Admin from "../pages/Admin";
-import NotFound from "../pages/NotFound";
-import LandscapingDemo from "../pages/demo-pages/LandscapingDemo";
-import PlumbingDemo from "../pages/demo-pages/PlumbingDemo";
-import HvacDemo from "../pages/demo-pages/HvacDemo";
-import ElectricianDemo from "../pages/demo-pages/ElectricianDemo";
-import RoofingDemo from "../pages/demo-pages/RoofingDemo";
-import CleaningServicesDemo from "../pages/demo-pages/CleaningServicesDemo";
-import PressureWashingDemo from "../pages/demo-pages/PressureWashingDemo";
-import AutoDetailingDemo from "../pages/demo-pages/AutoDetailingDemo";
-import RestaurantsDemo from "../pages/demo-pages/RestaurantsDemo";
-import CafeDemo from "../pages/demo-pages/CafeDemo";
-import BarbershopDemo from "../pages/demo-pages/BarbershopDemo";
-import SalonDemo from "../pages/demo-pages/SalonDemo";
-import FitnessDemo from "../pages/demo-pages/FitnessDemo";
-import RealEstateDemo from "../pages/demo-pages/RealEstateDemo";
-import PhotographyDemo from "../pages/demo-pages/PhotographyDemo";
-import DentalMedicalDemo from "../pages/demo-pages/DentalMedicalDemo";
-import LawFirmDemo from "../pages/demo-pages/LawFirmDemo";
-import ConstructionDemo from "../pages/demo-pages/ConstructionDemo";
-import MovingCompanyDemo from "../pages/demo-pages/MovingCompanyDemo";
-import HomeRemodelingDemo from "../pages/demo-pages/HomeRemodelingDemo";
-import Pricing from "../pages/Pricing";
-import Success from "../pages/Success";
-import Failure from "../pages/Failure";
-import TermsOfService from "../pages/TermsOfService";
-import PrivacyPolicy from "../pages/PrivacyPolicy";
-import OutreachUnsubscribe from "../pages/OutreachUnsubscribe";
+const Home = lazy(() => import("../pages/Home"));
+const Demos = lazy(() => import("../pages/Demos"));
+const Contact = lazy(() => import("../pages/Contact"));
+const Reviews = lazy(() => import("../pages/Reviews"));
+const Admin = lazy(() => import("../pages/Admin"));
+const NotFound = lazy(() => import("../pages/NotFound"));
+const LandscapingDemo = lazy(() => import("../pages/demo-pages/LandscapingDemo"));
+const PlumbingDemo = lazy(() => import("../pages/demo-pages/PlumbingDemo"));
+const HvacDemo = lazy(() => import("../pages/demo-pages/HvacDemo"));
+const ElectricianDemo = lazy(() => import("../pages/demo-pages/ElectricianDemo"));
+const RoofingDemo = lazy(() => import("../pages/demo-pages/RoofingDemo"));
+const CleaningServicesDemo = lazy(() => import("../pages/demo-pages/CleaningServicesDemo"));
+const PressureWashingDemo = lazy(() => import("../pages/demo-pages/PressureWashingDemo"));
+const AutoDetailingDemo = lazy(() => import("../pages/demo-pages/AutoDetailingDemo"));
+const RestaurantsDemo = lazy(() => import("../pages/demo-pages/RestaurantsDemo"));
+const CafeDemo = lazy(() => import("../pages/demo-pages/CafeDemo"));
+const BarbershopDemo = lazy(() => import("../pages/demo-pages/BarbershopDemo"));
+const SalonDemo = lazy(() => import("../pages/demo-pages/SalonDemo"));
+const FitnessDemo = lazy(() => import("../pages/demo-pages/FitnessDemo"));
+const RealEstateDemo = lazy(() => import("../pages/demo-pages/RealEstateDemo"));
+const PhotographyDemo = lazy(() => import("../pages/demo-pages/PhotographyDemo"));
+const DentalMedicalDemo = lazy(() => import("../pages/demo-pages/DentalMedicalDemo"));
+const LawFirmDemo = lazy(() => import("../pages/demo-pages/LawFirmDemo"));
+const ConstructionDemo = lazy(() => import("../pages/demo-pages/ConstructionDemo"));
+const MovingCompanyDemo = lazy(() => import("../pages/demo-pages/MovingCompanyDemo"));
+const HomeRemodelingDemo = lazy(() => import("../pages/demo-pages/HomeRemodelingDemo"));
+const Pricing = lazy(() => import("../pages/Pricing"));
+const Success = lazy(() => import("../pages/Success"));
+const Failure = lazy(() => import("../pages/Failure"));
+const TermsOfService = lazy(() => import("../pages/TermsOfService"));
+const PrivacyPolicy = lazy(() => import("../pages/PrivacyPolicy"));
+const OutreachUnsubscribe = lazy(() => import("../pages/OutreachUnsubscribe"));
 
 export const router = createBrowserRouter([
   {
@@ -50,7 +51,10 @@ export const router = createBrowserRouter([
       { path: "/demos/pressure-washing", element: <PressureWashingDemo /> },
       { path: "/demos/auto-detailing", element: <AutoDetailingDemo /> },
       { path: "/demos/restaurants", element: <RestaurantsDemo /> },
-      { path: "/demos/cafe", element: <CafeDemo /> },
+      {
+        path: "/demos/cafe",
+        element: <CafeDemo canonicalPath="/demos/cafes-coffee-shops" />,
+      },
       { path: "/demos/cafes-coffee-shops", element: <CafeDemo /> },
       { path: "/demos/barbershops", element: <BarbershopDemo /> },
       { path: "/demos/salons", element: <SalonDemo /> },

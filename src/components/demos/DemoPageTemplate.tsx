@@ -1,7 +1,18 @@
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
+import Seo from "../seo/Seo"
 import type { DemoPageData } from "../../types/demo"
+import {
+  buildBreadcrumbStructuredData,
+  buildFaqStructuredData,
+  buildWebPageStructuredData,
+} from "../../seo/site"
+import DemoPreview from "./DemoPreview"
 
 type Props = DemoPageData
+
+type DemoPageTemplateProps = Props & {
+  canonicalPath?: string
+}
 
 export default function DemoPageTemplate({
   businessName,
@@ -32,7 +43,27 @@ export default function DemoPageTemplate({
   finalCtaPrimaryText,
   finalCtaSecondaryText,
   theme,
-}: Props) {
+  canonicalPath,
+}: DemoPageTemplateProps) {
+  const locationPath = useLocation().pathname
+  const pagePath = canonicalPath ?? locationPath
+  const pageTitle = `${businessName} ${industryLabel} Website Demo`
+  const pageDescription = `${heroDescription} Explore this ${industryLabel.toLowerCase()} website demo from Levamen Tech${location ? ` for ${location}` : ""}.`
+
+  const structuredData = [
+    buildWebPageStructuredData({
+      path: pagePath,
+      title: pageTitle,
+      description: pageDescription,
+    }),
+    buildBreadcrumbStructuredData([
+      { name: "Home", path: "/" },
+      { name: "Demos", path: "/demos" },
+      { name: businessName, path: pagePath },
+    ]),
+    buildFaqStructuredData(faqs),
+  ]
+
   const renderHeroTitle = () => {
     if (!heroGradientWord || !heroTitle.includes(heroGradientWord)) {
       return heroTitle
@@ -58,6 +89,18 @@ export default function DemoPageTemplate({
 
   return (
     <div className="overflow-hidden px-4 pt-6 sm:px-8 sm:pt-10 lg:px-12">
+      <Seo
+        title={pageTitle}
+        description={pageDescription}
+        path={pagePath}
+        structuredData={structuredData}
+        keywords={[
+          `${industryLabel.toLowerCase()} website demo`,
+          `${industryLabel.toLowerCase()} website design`,
+          `${businessName.toLowerCase()} demo`,
+          "service business website example",
+        ]}
+      />
       <section className="container-custom">
         <div
           className="section-panel px-5 py-8 sm:px-10 sm:py-10 lg:px-14 lg:py-14"
@@ -113,89 +156,19 @@ export default function DemoPageTemplate({
             </div>
 
             <div className="relative min-w-0">
-              <div
-                className="card-glass relative mx-auto max-w-lg overflow-hidden p-5 sm:p-6"
-                style={{
-                  boxShadow: `0 24px 80px ${theme.surfaceTint}`,
-                }}
-              >
-                <div
-                  className="absolute inset-x-0 top-0 h-1"
-                  style={{
-                    backgroundImage: `linear-gradient(to right, ${theme.gradientFrom}, ${theme.gradientVia}, ${theme.gradientTo})`,
-                  }}
-                />
-
-                <div className="mb-6 flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-extrabold tracking-[-0.02em] text-slate-900">
-                      {businessName}
-                    </p>
-                    <p className="mt-1 text-sm text-slate-500">{industryLabel}</p>
-                  </div>
-
-                  <div className="rounded-full border border-slate-200/80 bg-white/85 px-3 py-1 text-xs font-semibold text-slate-500">
-                    Demo site
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="rounded-[1.5rem] border border-slate-200/80 bg-white/92 p-4">
-                    <div
-                      className="mb-3 h-3 w-28 rounded-full"
-                      style={{ backgroundColor: theme.accentSoft }}
-                    />
-                    <div className="mb-2 h-2 w-full rounded-full bg-slate-100" />
-                    <div className="h-2 w-4/5 rounded-full bg-slate-100" />
-                  </div>
-
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="rounded-[1.5rem] border border-slate-200/80 bg-white/92 p-4">
-                      <div
-                        className="mb-3 h-3 w-20 rounded-full"
-                        style={{ backgroundColor: theme.gradientVia }}
-                      />
-                      <div
-                        className="h-20 rounded-[1.1rem]"
-                        style={{
-                          background: `linear-gradient(to bottom right, ${theme.accentSoft}, white)`,
-                        }}
-                      />
-                    </div>
-
-                    <div className="rounded-[1.5rem] border border-slate-200/80 bg-white/92 p-4">
-                      <div
-                        className="mb-3 h-3 w-20 rounded-full"
-                        style={{ backgroundColor: theme.gradientTo }}
-                      />
-                      <div
-                        className="h-20 rounded-[1.1rem]"
-                        style={{
-                          background: `linear-gradient(to bottom right, ${theme.surfaceTint}, white)`,
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="rounded-[1.5rem] border border-slate-200/80 bg-white/92 p-4">
-                    <div className="mb-4 flex items-center justify-between">
-                      <div className="h-3 w-24 rounded-full bg-slate-200" />
-                      <div
-                        className="h-9 w-28 rounded-full"
-                        style={{
-                          backgroundImage: `linear-gradient(to right, ${theme.gradientFrom}, ${theme.gradientVia}, ${theme.gradientTo})`,
-                        }}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="h-2 w-full rounded-full bg-slate-100" />
-                      <div className="h-2 w-5/6 rounded-full bg-slate-100" />
-                      <div className="h-2 w-2/3 rounded-full bg-slate-100" />
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <DemoPreview
+                businessName={businessName}
+                industryLabel={industryLabel}
+                location={location}
+                heroTitle={heroTitle}
+                heroDescription={heroDescription}
+                primaryCtaText={primaryCtaText}
+                secondaryCtaText={secondaryCtaText}
+                services={services}
+                stats={stats}
+                theme={theme}
+                className="mx-auto max-w-xl"
+              />
             </div>
           </div>
 

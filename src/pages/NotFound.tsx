@@ -1,9 +1,16 @@
 import { Link } from "react-router-dom"
+import Seo from "../components/seo/Seo"
 
 export default function NotFound() {
   return (
-    <section className="section pt-8 sm:pt-10">
-      <div className="container-custom">
+    <>
+      <Seo
+        title="Page Not Found"
+        description="The requested Levamen Tech page could not be found."
+        noindex
+      />
+      <section className="section pt-8 sm:pt-10">
+        <div className="container-custom">
         <div className="section-panel mx-auto max-w-4xl px-6 py-14 text-center sm:px-12 sm:py-16">
           <p className="text-sm font-extrabold uppercase tracking-[0.24em] text-slate-400">
             404 error
@@ -27,7 +34,8 @@ export default function NotFound() {
             </Link>
           </div>
         </div>
-      </div>
-    </section>
+        </div>
+      </section>
+    </>
   )
 }

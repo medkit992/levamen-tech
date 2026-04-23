@@ -1,4 +1,3 @@
-import { motion } from "motion/react"
 import { ArrowRight, Sparkles } from "lucide-react"
 import { Link } from "react-router-dom"
 
@@ -58,14 +57,11 @@ export default function Hero({
               compact || isCentered ? "lg:grid-cols-1" : "lg:grid-cols-[1.1fr_0.9fr]",
             ].join(" ")}
           >
-            <motion.div
-              initial={{ opacity: 0, y: 22 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
+            <div
               className={
                 isCentered
-                  ? "mx-auto min-w-0 max-w-3xl text-center"
-                  : "min-w-0 max-w-3xl"
+                  ? "hero-enter mx-auto min-w-0 max-w-3xl text-center"
+                  : "hero-enter min-w-0 max-w-3xl"
               }
             >
               <div className="section-kicker">
@@ -121,15 +117,10 @@ export default function Hero({
                   Built to feel premium
                 </span>
               </div>
-            </motion.div>
+            </div>
 
             {!compact && !isCentered && (
-              <motion.div
-                initial={{ opacity: 0, x: 28 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.7, delay: 0.1 }}
-                className="relative min-w-0"
-              >
+              <div className="hero-enter-side relative min-w-0">
                 <div className="card-glass relative mx-auto max-w-lg overflow-hidden p-5 sm:p-6">
                   <div className="absolute inset-x-0 top-0 h-1 gradient-bg" />
 
@@ -194,7 +185,7 @@ export default function Hero({
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             )}
           </div>
         </div>

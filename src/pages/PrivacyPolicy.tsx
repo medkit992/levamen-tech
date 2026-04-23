@@ -1,4 +1,5 @@
 import { Database, LockKeyhole, Mail } from "lucide-react"
+import Seo from "../components/seo/Seo"
 
 const privacySections = [
   {
@@ -71,8 +72,15 @@ const privacySections = [
 
 export default function PrivacyPolicy() {
   return (
-    <section className="section pt-8 sm:pt-10">
-      <div className="container-custom">
+    <>
+      <Seo
+        title="Privacy Policy"
+        description="Privacy policy for Levamen Tech website visitors and clients."
+        path="/privacy"
+        noindex
+      />
+      <section className="section pt-8 sm:pt-10">
+        <div className="container-custom">
         <div className="section-panel px-6 py-8 sm:px-10 lg:px-14 lg:py-12">
           <div className="min-w-0 max-w-4xl">
             <div className="section-kicker">
@@ -146,7 +154,8 @@ export default function PrivacyPolicy() {
             </aside>
           </div>
         </div>
-      </div>
-    </section>
+        </div>
+      </section>
+    </>
   )
 }

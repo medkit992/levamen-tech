@@ -243,7 +243,9 @@ p {
 
 .hero-heading {
   max-width: 100%;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: manual;
   text-wrap: balance;
 }
 
@@ -316,6 +318,23 @@ p {
     radial-gradient(circle at bottom right, rgba(75, 140, 255, 0.12), transparent 18%);
 }
 
+.hero-enter,
+.hero-enter-side {
+  will-change: opacity, transform;
+}
+
+.hero-enter {
+  opacity: 0;
+  transform: translate3d(0, 22px, 0);
+  animation: hero-rise-in 640ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.hero-enter-side {
+  opacity: 0;
+  transform: translate3d(28px, 0, 0);
+  animation: hero-slide-in 720ms cubic-bezier(0.22, 1, 0.36, 1) 110ms forwards;
+}
+
 .legal-prose {
   display: grid;
   gap: 1.5rem;
@@ -351,6 +370,43 @@ p {
 .legal-prose p + p,
 .legal-prose p + ul {
   margin-top: 0.7rem;
+}
+
+@keyframes hero-rise-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 22px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes hero-slide-in {
+  from {
+    opacity: 0;
+    transform: translate3d(28px, 0, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .hero-enter,
+  .hero-enter-side {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @media (max-width: 768px) {
