@@ -1,0 +1,16 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" rx="40" fill="#081423"/>
+  <circle cx="196" cy="136" r="220" fill="#4B8CFF" fill-opacity="0.22"/>
+  <circle cx="1020" cy="176" r="240" fill="#8FD7FF" fill-opacity="0.14"/>
+  <rect x="56" y="56" width="1088" height="518" rx="32" fill="url(#panel)"/>
+  <text x="112" y="150" fill="#E2EEFF" font-family="Manrope, Arial, sans-serif" font-size="28" font-weight="800" letter-spacing="6">LEVAMEN TECH DEMO</text>
+  <text x="112" y="252" fill="#FFFFFF" font-family="Manrope, Arial, sans-serif" font-size="76" font-weight="800">Plumbing</text>
+  <text x="112" y="334" fill="#FFFFFF" font-family="Manrope, Arial, sans-serif" font-size="76" font-weight="800">Website Demo</text>
+  <text x="112" y="408" fill="#D5E8FF" font-family="Manrope, Arial, sans-serif" font-size="30" font-weight="600">Urgent-call clarity, trust-first layout, and stronger local credibility.</text>
+  <defs>
+    <linearGradient id="panel" x1="96" y1="86" x2="1080" y2="562" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#122846"/>
+      <stop offset="1" stop-color="#102039"/>
+    </linearGradient>
+  </defs>
+</svg>

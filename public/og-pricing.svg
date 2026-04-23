@@ -1,0 +1,23 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" rx="40" fill="#071321"/>
+  <circle cx="196" cy="120" r="210" fill="#FFB347" fill-opacity="0.22"/>
+  <circle cx="1028" cy="180" r="240" fill="#4B8CFF" fill-opacity="0.2"/>
+  <rect x="56" y="56" width="1088" height="518" rx="32" fill="url(#panel)"/>
+  <text x="112" y="150" fill="#F8FAFC" font-family="Manrope, Arial, sans-serif" font-size="28" font-weight="800" letter-spacing="6">LEVAMEN TECH</text>
+  <text x="112" y="252" fill="#FFFFFF" font-family="Manrope, Arial, sans-serif" font-size="74" font-weight="800">Guided Website Pricing</text>
+  <text x="112" y="334" fill="#FFFFFF" font-family="Manrope, Arial, sans-serif" font-size="74" font-weight="800">Before Payment</text>
+  <text x="112" y="408" fill="#CBD5E1" font-family="Manrope, Arial, sans-serif" font-size="30" font-weight="600">Choose a plan, add what matters, and submit for review.</text>
+  <rect x="112" y="456" width="220" height="58" rx="29" fill="url(#button)"/>
+  <text x="160" y="493" fill="#081423" font-family="Manrope, Arial, sans-serif" font-size="28" font-weight="800">Get Started</text>
+  <defs>
+    <linearGradient id="panel" x1="96" y1="86" x2="1080" y2="562" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#112844"/>
+      <stop offset="1" stop-color="#0D1A2C"/>
+    </linearGradient>
+    <linearGradient id="button" x1="112" y1="456" x2="332" y2="514" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF7A18"/>
+      <stop offset="0.52" stop-color="#FFB347"/>
+      <stop offset="1" stop-color="#4B8CFF"/>
+    </linearGradient>
+  </defs>
+</svg>

@@ -7,11 +7,35 @@ import {
   buildWebPageStructuredData,
 } from "../../seo/site"
 import DemoPreview from "./DemoPreview"
+import { trackCta } from "../../lib/analytics"
 
 type Props = DemoPageData
 
 type DemoPageTemplateProps = Props & {
   canonicalPath?: string
+}
+
+const demoOpenGraphImages: Record<string, string> = {
+  "/demos/landscaping": "/og-demo-landscaping.svg",
+  "/demos/plumbing": "/og-demo-plumbing.svg",
+  "/demos/hvac": "/og-demo-hvac.svg",
+}
+
+function getDemoImage(path: string) {
+  return demoOpenGraphImages[path] ?? "/og-demos.svg"
+}
+
+function buildContextPath(
+  basePath: string,
+  industryLabel: string,
+  pagePath: string
+) {
+  const params = new URLSearchParams({
+    industry: industryLabel,
+    demo: pagePath.split("/").at(-1) ?? "",
+  })
+
+  return `${basePath}?${params.toString()}`
 }
 
 export default function DemoPageTemplate({
@@ -45,10 +69,18 @@ export default function DemoPageTemplate({
   theme,
   canonicalPath,
 }: DemoPageTemplateProps) {
-  const locationPath = useLocation().pathname
-  const pagePath = canonicalPath ?? locationPath
+  const routerLocation = useLocation()
+  const pagePath = canonicalPath ?? routerLocation.pathname
   const pageTitle = `${businessName} ${industryLabel} Website Demo`
   const pageDescription = `${heroDescription} Explore this ${industryLabel.toLowerCase()} website demo from Levamen Tech${location ? ` for ${location}` : ""}.`
+  const primaryCtaPath = buildContextPath("/contact", industryLabel, pagePath)
+  const pricingCtaPath = buildContextPath("/pricing", industryLabel, pagePath)
+  const resolvedPrimaryCtaPath =
+    primaryCtaHref === "/pricing"
+      ? pricingCtaPath
+      : primaryCtaHref === "/contact"
+        ? primaryCtaPath
+        : primaryCtaHref
 
   const structuredData = [
     buildWebPageStructuredData({
@@ -93,6 +125,7 @@ export default function DemoPageTemplate({
         title={pageTitle}
         description={pageDescription}
         path={pagePath}
+        image={getDemoImage(pagePath)}
         structuredData={structuredData}
         keywords={[
           `${industryLabel.toLowerCase()} website demo`,
@@ -126,8 +159,15 @@ export default function DemoPageTemplate({
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
-                  to={primaryCtaHref}
+                  to={resolvedPrimaryCtaPath}
                   className="btn-primary !w-full sm:!w-auto"
+                  onClick={() =>
+                    trackCta(primaryCtaText, {
+                      from_path: pagePath,
+                      to_path: resolvedPrimaryCtaPath,
+                      industry: industryLabel,
+                    })
+                  }
                   style={{
                     backgroundImage: `linear-gradient(to right, ${theme.gradientFrom}, ${theme.gradientVia}, ${theme.gradientTo})`,
                   }}
@@ -138,6 +178,13 @@ export default function DemoPageTemplate({
                 <Link
                   to={secondaryCtaHref}
                   className="btn-secondary !w-full sm:!w-auto"
+                  onClick={() =>
+                    trackCta(secondaryCtaText, {
+                      from_path: pagePath,
+                      to_path: secondaryCtaHref,
+                      industry: industryLabel,
+                    })
+                  }
                 >
                   {secondaryCtaText}
                 </Link>
@@ -347,8 +394,15 @@ export default function DemoPageTemplate({
 
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link
-                to="/contact"
+                to={primaryCtaPath}
                 className="btn-primary !w-full sm:!w-auto"
+                onClick={() =>
+                  trackCta(finalCtaPrimaryText, {
+                    from_path: pagePath,
+                    to_path: primaryCtaPath,
+                    industry: industryLabel,
+                  })
+                }
                 style={{
                   backgroundImage: `linear-gradient(to right, ${theme.gradientFrom}, ${theme.gradientVia}, ${theme.gradientTo})`,
                 }}
@@ -356,7 +410,17 @@ export default function DemoPageTemplate({
                 {finalCtaPrimaryText}
               </Link>
 
-              <Link to="/demos" className="btn-secondary !w-full sm:!w-auto">
+              <Link
+                to="/demos"
+                className="btn-secondary !w-full sm:!w-auto"
+                onClick={() =>
+                  trackCta(finalCtaSecondaryText, {
+                    from_path: pagePath,
+                    to_path: "/demos",
+                    industry: industryLabel,
+                  })
+                }
+              >
                 {finalCtaSecondaryText}
               </Link>
             </div>

@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react"
 import { ArrowRight, Menu, Sparkles, X } from "lucide-react"
-import { NavLink, Link } from "react-router-dom"
+import { NavLink, Link, useLocation } from "react-router-dom"
 import {
   footerContactLinks,
   legalNavItems,
   primaryNavItems,
 } from "./siteLinks"
+import { trackCta } from "../../lib/analytics"
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const location = useLocation()
   const handleCloseMenu = () => setIsMenuOpen(false)
 
   useEffect(() => {
@@ -68,6 +70,12 @@ export default function Navbar() {
                 key={item.to}
                 to={item.to}
                 end={item.to === "/"}
+                onClick={() =>
+                  trackCta(`Nav ${item.label}`, {
+                    from_path: location.pathname,
+                    to_path: item.to,
+                  })
+                }
                 className={({ isActive }) =>
                   [
                     "relative rounded-full px-4 py-2.5 text-sm font-semibold tracking-[-0.02em] transition-all duration-200",
@@ -90,10 +98,28 @@ export default function Navbar() {
           </div>
 
           <div className="hidden items-center gap-3 lg:flex">
-            <Link to="/pricing" className="btn-secondary !min-h-[2.85rem] !px-5">
+            <Link
+              to="/pricing"
+              className="btn-secondary !min-h-[2.85rem] !px-5"
+              onClick={() =>
+                trackCta("See Plans", {
+                  from_path: location.pathname,
+                  to_path: "/pricing",
+                })
+              }
+            >
               See Plans
             </Link>
-            <Link to="/contact" className="btn-primary !min-h-[2.85rem] !px-5">
+            <Link
+              to="/contact"
+              className="btn-primary !min-h-[2.85rem] !px-5"
+              onClick={() =>
+                trackCta("Start Project", {
+                  from_path: location.pathname,
+                  to_path: "/contact",
+                })
+              }
+            >
               Start a Project
               <ArrowRight className="h-4 w-4" />
             </Link>
@@ -147,6 +173,12 @@ export default function Navbar() {
                     to={item.to}
                     end={item.to === "/"}
                     onClick={handleCloseMenu}
+                    onClickCapture={() =>
+                      trackCta(`Mobile Nav ${item.label}`, {
+                        from_path: location.pathname,
+                        to_path: item.to,
+                      })
+                    }
                     className={({ isActive }) =>
                       [
                         "rounded-[1.45rem] border p-4 transition duration-200",
@@ -199,6 +231,12 @@ export default function Navbar() {
                   to="/pricing"
                   className="btn-secondary !w-full !rounded-[1.2rem]"
                   onClick={handleCloseMenu}
+                  onClickCapture={() =>
+                    trackCta("See Pricing", {
+                      from_path: location.pathname,
+                      to_path: "/pricing",
+                    })
+                  }
                 >
                   See Pricing
                 </Link>
@@ -206,6 +244,12 @@ export default function Navbar() {
                   to="/contact"
                   className="btn-primary !w-full !rounded-[1.2rem]"
                   onClick={handleCloseMenu}
+                  onClickCapture={() =>
+                    trackCta("Reach Out", {
+                      from_path: location.pathname,
+                      to_path: "/contact",
+                    })
+                  }
                 >
                   Reach Out
                   <ArrowRight className="h-4 w-4" />

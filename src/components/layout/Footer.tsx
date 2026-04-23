@@ -6,7 +6,7 @@ import {
   ShieldCheck,
   Sparkles,
 } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import {
   footerContactLinks,
   footerHighlights,
@@ -14,8 +14,11 @@ import {
   legalNavItems,
   primaryNavItems,
 } from "./siteLinks"
+import { trackCta } from "../../lib/analytics"
 
 export default function Footer() {
+  const location = useLocation()
+
   return (
     <footer className="mt-16 px-4 pb-6 sm:px-8 lg:px-12">
       <div className="container-custom">
@@ -41,10 +44,28 @@ export default function Footer() {
               </div>
 
               <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-                <Link to="/demos" className="btn-secondary !w-full sm:!w-auto">
+                <Link
+                  to="/demos"
+                  className="btn-secondary !w-full sm:!w-auto"
+                  onClick={() =>
+                    trackCta("Explore Demos", {
+                      from_path: location.pathname,
+                      to_path: "/demos",
+                    })
+                  }
+                >
                   Explore Demos
                 </Link>
-                <Link to="/contact" className="btn-primary !w-full sm:!w-auto">
+                <Link
+                  to="/contact"
+                  className="btn-primary !w-full sm:!w-auto"
+                  onClick={() =>
+                    trackCta("Start a Project", {
+                      from_path: location.pathname,
+                      to_path: "/contact",
+                    })
+                  }
+                >
                   Start a Project
                   <ArrowRight className="h-4 w-4" />
                 </Link>
@@ -98,6 +119,12 @@ export default function Footer() {
                     <Link
                       key={item.to}
                       to={item.to}
+                      onClick={() =>
+                        trackCta(`Footer ${item.label}`, {
+                          from_path: location.pathname,
+                          to_path: item.to,
+                        })
+                      }
                       className="rounded-full border border-slate-200/80 bg-white/72 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-white hover:text-slate-950"
                     >
                       {item.label}

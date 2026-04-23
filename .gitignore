@@ -27,6 +27,7 @@ dist-ssr
 .agents/
 .claude/
 skills-lock.json
+.vercel/
 
 # Supabase local temp output
 supabase/.temp/

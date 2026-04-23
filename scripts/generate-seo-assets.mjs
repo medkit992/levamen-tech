@@ -162,6 +162,7 @@ const corePages = [
     title: "Custom Websites for Service Businesses | Levamen Tech",
     description:
       "Levamen Tech designs and builds custom websites for service businesses, with niche demos, responsive builds, clear pricing, and conversion-focused structure.",
+    image: "/og-home.svg",
     keywords: [
       "custom websites for service businesses",
       "small business web design",
@@ -203,6 +204,7 @@ const corePages = [
     title: "Website Demos for Service Businesses | Levamen Tech",
     description:
       "Browse niche website demos for landscapers, plumbers, HVAC companies, electricians, restaurants, salons, law firms, and other service businesses.",
+    image: "/og-demos.svg",
     keywords: [
       "website demos for service businesses",
       "small business website examples",
@@ -255,6 +257,7 @@ const corePages = [
     title: "Website Pricing and Packages for Service Businesses | Levamen Tech",
     description:
       "Compare Levamen Tech website packages, customize your plan with add-ons, and send a project request for review before any payment is collected.",
+    image: "/og-pricing.svg",
     keywords: [
       "website pricing for service businesses",
       "small business website packages",
@@ -352,6 +355,7 @@ const corePages = [
     title: "Contact Levamen Tech | Web Design for Service Businesses",
     description:
       "Reach out to Levamen Tech about a custom website project, pricing questions, demo requests, or a new service business site.",
+    image: "/og-contact.svg",
     keywords: [
       "contact web designer",
       "service business website designer",
@@ -404,6 +408,14 @@ const demoPages = demoCatalog.map((demo) => ({
   path: `/demos/${demo.slug}`,
   title: `${demo.title} Website Demo | Levamen Tech`,
   description: `${demo.description} Explore this ${demo.title.toLowerCase()} website demo from Levamen Tech.`,
+  image:
+    demo.slug === "landscaping"
+      ? "/og-demo-landscaping.svg"
+      : demo.slug === "plumbing"
+        ? "/og-demo-plumbing.svg"
+        : demo.slug === "hvac"
+          ? "/og-demo-hvac.svg"
+          : "/og-demos.svg",
   keywords: [
     `${demo.title.toLowerCase()} website demo`,
     `${demo.title.toLowerCase()} website design`,
@@ -625,6 +637,7 @@ function buildNoscript(page) {
 
 function buildHeadBlock(page) {
   const canonicalUrl = absoluteUrl(page.canonicalPath ?? page.path)
+  const pageImage = absoluteUrl(page.image ?? site.defaultImagePath)
   const jsonLd = page.structuredData
     .map(
       (item) =>
@@ -652,13 +665,13 @@ function buildHeadBlock(page) {
     `    <meta property="og:type" content="website" />`,
     `    <meta property="og:url" content="${escapeHtml(canonicalUrl)}" />`,
     `    <meta property="og:site_name" content="${escapeHtml(site.name)}" />`,
-    `    <meta property="og:image" content="${escapeHtml(absoluteUrl(site.defaultImagePath))}" />`,
+    `    <meta property="og:image" content="${escapeHtml(pageImage)}" />`,
     `    <meta property="og:image:width" content="1200" />`,
     `    <meta property="og:image:height" content="630" />`,
     `    <meta name="twitter:card" content="summary_large_image" />`,
     `    <meta name="twitter:title" content="${escapeHtml(page.title)}" />`,
     `    <meta name="twitter:description" content="${escapeHtml(page.description)}" />`,
-    `    <meta name="twitter:image" content="${escapeHtml(absoluteUrl(site.defaultImagePath))}" />`,
+    `    <meta name="twitter:image" content="${escapeHtml(pageImage)}" />`,
     jsonLd,
   ]
     .filter(Boolean)

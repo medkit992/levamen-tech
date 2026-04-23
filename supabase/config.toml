@@ -414,6 +414,15 @@ verify_jwt = false
 [functions.admin-dashboard]
 verify_jwt = false
 
+[functions.analytics-admin]
+verify_jwt = false
+
+[functions.vercel-analytics-drain]
+verify_jwt = false
+
+[functions.browser-analytics]
+verify_jwt = false
+
 [functions.outreach-admin]
 verify_jwt = false
 

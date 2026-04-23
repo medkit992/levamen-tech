@@ -1,5 +1,6 @@
 import { ArrowRight, Check, Sparkles } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
+import { trackCta } from "../../lib/analytics"
 
 const plans = [
   {
@@ -53,6 +54,8 @@ const plans = [
 ]
 
 export default function PricingPreview() {
+  const location = useLocation()
+
   return (
       <section className="section pt-8 sm:pt-10">
       <div className="container-custom">
@@ -74,7 +77,16 @@ export default function PricingPreview() {
             </p>
           </div>
 
-          <Link to="/pricing" className="btn-secondary !w-full sm:!w-auto">
+          <Link
+            to="/pricing"
+            className="btn-secondary !w-full sm:!w-auto"
+            onClick={() =>
+              trackCta("View full pricing", {
+                from_path: location.pathname,
+                to_path: "/pricing",
+              })
+            }
+          >
             View full pricing
             <ArrowRight className="h-4 w-4" />
           </Link>
@@ -143,6 +155,12 @@ export default function PricingPreview() {
                 <Link
                   to={`/pricing?plan=${plan.name.toLowerCase()}`}
                   className={plan.highlighted ? "btn-primary w-full" : "btn-secondary w-full"}
+                  onClick={() =>
+                    trackCta(`Choose ${plan.name}`, {
+                      from_path: location.pathname,
+                      to_path: `/pricing?plan=${plan.name.toLowerCase()}`,
+                    })
+                  }
                 >
                   Choose {plan.name}
                 </Link>

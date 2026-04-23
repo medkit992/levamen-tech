@@ -60,7 +60,13 @@ Deno.serve(async (req) => {
 async function handleLoad(
   supabaseAdmin: ReturnType<typeof createSupabaseAdminClient>
 ) {
-  const [reviewsRes, inquiriesRes, clientsRes] = await Promise.all([
+  const [
+    reviewsRes,
+    inquiriesRes,
+    clientsRes,
+    contactInquiriesRes,
+    outreachPendingRes,
+  ] = await Promise.all([
     supabaseAdmin.from("reviews").select("*").order("created_at", {
       ascending: false,
     }),
@@ -70,9 +76,22 @@ async function handleLoad(
     supabaseAdmin.from("client_accounts").select("*").order("updated_at", {
       ascending: false,
     }),
+    supabaseAdmin.from("contact_inquiries").select("*").order("created_at", {
+      ascending: false,
+    }).limit(20),
+    supabaseAdmin
+      .from("outreach_drafts")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "pending_approval"),
   ]);
 
-  const errors = [reviewsRes.error, inquiriesRes.error, clientsRes.error]
+  const errors = [
+    reviewsRes.error,
+    inquiriesRes.error,
+    clientsRes.error,
+    contactInquiriesRes.error,
+    outreachPendingRes.error,
+  ]
     .filter((value) => value != null)
     .map((value) => value?.message)
     .filter(Boolean);
@@ -91,6 +110,8 @@ async function handleLoad(
     reviews: reviewsRes.data ?? [],
     inquiries: inquiriesRes.data ?? [],
     clients: clientsRes.data ?? [],
+    contactInquiries: contactInquiriesRes.data ?? [],
+    outreachPendingCount: outreachPendingRes.count ?? 0,
   });
 }
 

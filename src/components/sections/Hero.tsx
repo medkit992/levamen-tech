@@ -1,5 +1,6 @@
 import { ArrowRight, Sparkles } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
+import { trackCta } from "../../lib/analytics"
 
 type HeroProps = {
   eyebrow?: string
@@ -27,6 +28,7 @@ export default function Hero({
   compact = false,
 }: HeroProps) {
   const isCentered = align === "center"
+  const location = useLocation()
 
   const renderTitle = () => {
     if (!gradientWord || !title.includes(gradientWord)) {
@@ -88,7 +90,16 @@ export default function Hero({
                   isCentered ? "justify-center" : "",
                 ].join(" ")}
               >
-                <Link to={primaryCtaTo} className="btn-primary !w-full sm:!w-auto">
+                <Link
+                  to={primaryCtaTo}
+                  className="btn-primary !w-full sm:!w-auto"
+                  onClick={() =>
+                    trackCta(primaryCtaText, {
+                      from_path: location.pathname,
+                      to_path: primaryCtaTo,
+                    })
+                  }
+                >
                   {primaryCtaText}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
@@ -96,6 +107,12 @@ export default function Hero({
                 <Link
                   to={secondaryCtaTo}
                   className="btn-secondary !w-full sm:!w-auto"
+                  onClick={() =>
+                    trackCta(secondaryCtaText, {
+                      from_path: location.pathname,
+                      to_path: secondaryCtaTo,
+                    })
+                  }
                 >
                   {secondaryCtaText}
                 </Link>
