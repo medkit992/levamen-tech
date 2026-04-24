@@ -515,6 +515,8 @@ export default function DemoPreview({
   const heroStyle = buildHeroStyle(theme)
   const supportStyle = buildSupportStyle(theme)
   const gradientPillStyle = buildGradientPillStyle(theme)
+  const previewKicker = compact ? "Demo preview" : preset.heroLabel
+  const surfaceKicker = compact ? "Preview" : preset.surfaceLabel
 
   return (
     <div
@@ -540,10 +542,17 @@ export default function DemoPreview({
             </div>
 
             <div className="min-w-0">
-              <p className="truncate text-[0.68rem] font-extrabold uppercase tracking-[0.22em] text-slate-500">
-                {preset.heroLabel}
+              <p className="text-[0.68rem] font-extrabold uppercase tracking-[0.22em] text-slate-500">
+                {previewKicker}
               </p>
-              <p className="truncate text-base font-extrabold tracking-[-0.03em] text-slate-950 sm:text-lg">
+              <p
+                className={[
+                  "font-extrabold tracking-[-0.03em] text-slate-950",
+                  compact
+                    ? "mt-1 text-sm leading-tight"
+                    : "truncate text-base sm:text-lg",
+                ].join(" ")}
+              >
                 {businessName}
               </p>
             </div>
@@ -576,11 +585,21 @@ export default function DemoPreview({
                   <span className="h-2.5 w-2.5 rounded-full bg-slate-100" />
                 </div>
 
-                <span className="truncate text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-slate-500">
-                  {preset.surfaceLabel}
+                <span
+                  className={[
+                    "text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-slate-500",
+                    compact ? "" : "truncate",
+                  ].join(" ")}
+                >
+                  {surfaceKicker}
                 </span>
 
-                <span className="hidden rounded-full border border-slate-200/70 bg-white/88 px-2 py-1 text-[0.64rem] font-semibold uppercase tracking-[0.16em] text-slate-500 sm:inline-flex">
+                <span
+                  className={[
+                    "rounded-full border border-slate-200/70 bg-white/88 px-2 py-1 text-[0.64rem] font-semibold uppercase tracking-[0.16em] text-slate-500",
+                    compact ? "hidden" : "hidden sm:inline-flex",
+                  ].join(" ")}
+                >
                   {location ?? "Arizona"}
                 </span>
               </div>
